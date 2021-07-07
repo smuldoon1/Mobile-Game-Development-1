@@ -14,16 +14,22 @@
    }
 
    function update() {
-        playerX += 0.1;
-        playerY += 0.1;
+        playerX += 1;
+        playerY += 1;
    }
 
    function render() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         ctx.beginPath();
-        ctx.arc(playerX, playerY, 10, 0, Math.PI*2);
+        ctx.arc(playerX, playerY, 100, 0, Math.PI*2);
         ctx.fillStyle = "#ff0000";
+        ctx.fill();
+        ctx.closePath();
+
+        ctx.beginPath();
+        ctx.rect(playerX + 250, playerY, 200, 200);
+        ctx.fillStyle = "#0000ff";
         ctx.fill();
         ctx.closePath();
    }
