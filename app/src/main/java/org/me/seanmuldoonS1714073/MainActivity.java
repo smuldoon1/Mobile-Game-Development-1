@@ -29,8 +29,8 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        webView = (WebView) findViewById(R.id.mainWebView);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        webView = (WebView)findViewById(R.id.mainWebView);
 
         webView.getSettings().setJavaScriptEnabled(true);
         webView.loadUrl("file:///android_asset/game.html");
