@@ -11,7 +11,10 @@ var playerX;
 var playerY;
 var playerWidth;
 var playerHeight;
+
+var jumps;
 var runSpeed;
+var velocity;
 
 var buildingsArray = [];
 var timeSinceLastBuilding;
@@ -26,13 +29,15 @@ function init() {
     playerX = canvas.width * 0.1;
     playerY = canvas.height * 0.5 - playerHeight;
 
-    timeSinceLastBuilding = 1750;
+    jumps = 1;
     runSpeed = 0.5;
+    velocity = 0.1;
 
+    timeSinceLastBuilding = 1750;
     buildingsArray.push({
-        x: canvas.width * 0.5,
+        x: canvas.width * 0,
         y: canvas.height * 0.5,
-        width: canvas.width * 0.8,
+        width: canvas.width * 1.5,
         height: canvas.height
     });
 
@@ -59,11 +64,37 @@ function update() {
         timeSinceLastBuilding = Math.random() * 750;
     }
 
+    var isGrounded = false;
     for (var i = 0; i < buildingsArray.length; i++) {
-        buildingsArray[i].x -= deltaTime * runSpeed;
-        if (buildingsArray[i].x < -canvas.width) {
+        var building = buildingsArray[i];
+        building.x -= deltaTime * runSpeed;
+
+        if (playerY + playerHeight < building.y + 10 &&
+            playerY + playerHeight > building.y &&
+            playerX + playerWidth >= building.x &&
+            playerX <= building.x + building.width &&
+            velocity > 0)
+        {
+            playerY = building.y - playerHeight;
+            isGrounded = true;
+        }
+
+        if (building.x < -building.width) {
             buildingsArray.splice(i, 1);
         }
+    }
+
+    if (isGrounded) {
+        jumps = 1;
+        velocity = 0.1;
+    }
+    else {
+        velocity += deltaTime * 0.001;
+        playerY += velocity * deltaTime;
+    }
+
+    if (leftPressed) {
+        jump(!isGrounded);
     }
 }
 
@@ -126,6 +157,14 @@ function touchEndHandler(e) {
         leftPressed = false;
         rightPressed = false;
     }
+}
+
+function jump(useJump) {
+    if (jumps <= 0)
+        return;
+    if (useJump)
+        jumps--;
+    velocity = -1;
 }
 
 function gameLoop() {
