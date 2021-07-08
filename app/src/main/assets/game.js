@@ -19,6 +19,11 @@ var velocityX;
 var velocityY;
 var ballRadius;
 
+var buildingsArray = [];
+var timeSinceLastBuilding;
+var buildingWidth;
+var buildingHeight;
+
 function init() {
     previousDate = performance.now();
 
@@ -34,6 +39,16 @@ function init() {
     velocityY = 0.3;
     ballRadius = 100;
 
+    timeSinceLastBuilding = 1000;
+    runSpeed = 0.5;
+
+    buildingsArray.push({
+        x: canvas.width * 0.5,
+        y: canvas.height * 0.5,
+        width: canvas.width * 0.8,
+        height: canvas.height
+    });
+
     rightPressed = false;
     leftPressed = false;
 
@@ -47,11 +62,17 @@ function update() {
     ballX += velocityX * deltaTime;
     ballY += velocityY * deltaTime;
 
-    if (ballX < ballRadius || ballX > canvas.width - ballRadius) {
-        velocityX = -velocityX;
+    if (ballX < ballRadius) {
+        velocityX = Math.abs(velocityX);
     }
-    if (ballY < ballRadius || ballY > canvas.height - ballRadius) {
-        velocityY = -velocityY;
+    if (ballX > canvas.width - ballRadius) {
+        velocityX = -Math.abs(velocityX);
+    }
+    if (ballY < ballRadius) {
+        velocityY = Math.abs(velocityY);
+    }
+    if (ballY > canvas.height - ballRadius) {
+        velocityY = -Math.abs(velocityY);
     }
 
     if (rightPressed && playerX < canvas.width - playerWidth) {
@@ -59,6 +80,24 @@ function update() {
     }
     if (leftPressed && playerX > 0) {
         playerX -= playerSpeed * deltaTime;
+    }
+
+    timeSinceLastBuilding += deltaTime;
+    if (timeSinceLastBuilding > 2500) {
+        timeSinceLastBuilding = Math.random() * 750;
+        buildingsArray.push({
+            x: canvas.width * 1.5,
+            y: (Math.random() * canvas.height * 0.5 + (canvas.height * 0.25)),
+            width: Math.random() * canvas.width * 0.3 + canvas.width * 0.35,
+            height: canvas.height
+        });
+    }
+
+    for (var i = 0; i < buildingsArray.length; i++) {
+        buildingsArray[i].x -= deltaTime * runSpeed;
+        if (buildingsArray[i].x < -canvas.width * 0.5) {
+            buildingsArray.splice(i, 1);
+        }
     }
 }
 
@@ -76,6 +115,15 @@ function render() {
     ctx.fillStyle = "#0000ff";
     ctx.fill();
     ctx.closePath();
+
+    for (var i = 0; i < buildingsArray.length; i++) {
+        var building = buildingsArray[i];
+        ctx.beginPath();
+        ctx.rect(building.x, building.y, building.width, building.height);
+        ctx.fillStyle = "#00ff00";
+        ctx.fill();
+        ctx.closePath();
+    }
 }
 
 function keyDownHandler(e) {
@@ -131,4 +179,4 @@ function gameLoop() {
 init();
 
 // Starts the game loop so the input, update and render functions are called every millisecond
-setInterval(gameLoop, 10);
+setInterval(gameLoop, 1);
