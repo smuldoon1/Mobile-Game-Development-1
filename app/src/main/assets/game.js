@@ -1,6 +1,8 @@
 var canvas = document.getElementById("gameCanvas");
 var ctx = canvas.getContext("2d");
 
+var scene = "main_menu";
+
 var previousDate;
 var deltaTime;
 
@@ -12,7 +14,8 @@ var playerY;
 var playerWidth;
 var playerHeight;
 
-var jumpCooldown;
+var isJumping;
+var jumpHeldTime;
 var jumps;
 var runSpeed;
 var velocity;
@@ -30,7 +33,8 @@ function init() {
     playerX = canvas.width * 0.1;
     playerY = canvas.height * 0.5 - playerHeight;
 
-    jumpCooldown = 0;
+    isJumping = false;
+    jumpHeldTime = 0;
     jumps = 2;
     runSpeed = 0.5;
     velocity = 0.1;
@@ -72,7 +76,7 @@ function update() {
         var building = buildingsArray[i];
         building.x -= deltaTime * runSpeed;
 
-        if (playerY + playerHeight < building.y + 10 &&
+        if (playerY + playerHeight < building.y + 20 &&
             playerY + playerHeight > building.y - 10 &&
             playerX + playerWidth >= building.x &&
             playerX <= building.x + building.width &&
@@ -95,15 +99,19 @@ function update() {
         if (jumps == 2) {
             jumps = 1;
         }
-        velocity += deltaTime * 0.0025;
+        velocity += deltaTime * 0.003;
         playerY += velocity * deltaTime;
     }
 
-    if (jumpCooldown > 0) {
-        jumpCooldown -= deltaTime;
-        if (jumpCooldown < 0) {
-            jumpCooldown = 0;
+    if (leftPressed) {
+        if (isJumping && jumpHeldTime < 200) {
+            velocity -= 0.035 * (jumpHeldTime / 200);
+            jumpHeldTime += deltaTime;
         }
+    }
+    else {
+        isJumping = false;
+        jumpHeldTime = 0;
     }
 
     if (playerY > canvas.height) {
@@ -174,10 +182,10 @@ function touchEndHandler(e) {
 }
 
 function jump() {
-    if (jumps > 0 && jumpCooldown <= 0) {
-        jumpCooldown = 100;
+    if (jumps > 0 && !isJumping) {
+        isJumping = true;
         jumps--;
-        velocity = -2;
+        velocity = -1.25;
     }
 }
 
@@ -194,4 +202,4 @@ function gameLoop() {
 init();
 
 // Starts the game loop so the input, update and render functions are called every millisecond
-setInterval(gameLoop, 1);
+gameLoopInterval = setInterval(gameLoop, 1);
