@@ -12,11 +12,12 @@ var playerY;
 var playerWidth;
 var playerHeight;
 
+var jumpCooldown;
 var jumps;
 var runSpeed;
 var velocity;
 
-var buildingsArray = [];
+var buildingsArray;
 var timeSinceLastBuilding;
 var buildingWidth;
 var buildingHeight;
@@ -29,10 +30,12 @@ function init() {
     playerX = canvas.width * 0.1;
     playerY = canvas.height * 0.5 - playerHeight;
 
-    jumps = 1;
+    jumpCooldown = 0;
+    jumps = 2;
     runSpeed = 0.5;
     velocity = 0.1;
 
+    buildingsArray = [];
     timeSinceLastBuilding = 1750;
     buildingsArray.push({
         x: canvas.width * 0,
@@ -70,7 +73,7 @@ function update() {
         building.x -= deltaTime * runSpeed;
 
         if (playerY + playerHeight < building.y + 10 &&
-            playerY + playerHeight > building.y &&
+            playerY + playerHeight > building.y - 10 &&
             playerX + playerWidth >= building.x &&
             playerX <= building.x + building.width &&
             velocity > 0)
@@ -85,16 +88,26 @@ function update() {
     }
 
     if (isGrounded) {
-        jumps = 1;
+        jumps = 2;
         velocity = 0.1;
     }
     else {
-        velocity += deltaTime * 0.001;
+        if (jumps == 2) {
+            jumps = 1;
+        }
+        velocity += deltaTime * 0.0025;
         playerY += velocity * deltaTime;
     }
 
-    if (leftPressed) {
-        jump(!isGrounded);
+    if (jumpCooldown > 0) {
+        jumpCooldown -= deltaTime;
+        if (jumpCooldown < 0) {
+            jumpCooldown = 0;
+        }
+    }
+
+    if (playerY > canvas.height) {
+        init();
     }
 }
 
@@ -116,7 +129,7 @@ function render() {
     ctx.fill();
     ctx.closePath();
 
-    ctx.strokeText("Buildings: " + buildingsArray.length, 10, 50);
+    ctx.strokeText("Jumps: " + jumps, 10, 100);
 }
 
 function keyDownHandler(e) {
@@ -144,6 +157,7 @@ function touchStartHandler(e) {
         if (touches[i].pageX < canvas.width * 0.18) {
             leftPressed = true;
             rightPressed = false;
+            jump();
         }
         if (touches[i].pageX >= canvas.width * 0.18) {
             rightPressed = true;
@@ -159,12 +173,12 @@ function touchEndHandler(e) {
     }
 }
 
-function jump(useJump) {
-    if (jumps <= 0)
-        return;
-    if (useJump)
+function jump() {
+    if (jumps > 0 && jumpCooldown <= 0) {
+        jumpCooldown = 100;
         jumps--;
-    velocity = -1;
+        velocity = -2;
+    }
 }
 
 function gameLoop() {
