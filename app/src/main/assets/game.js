@@ -11,13 +11,7 @@ var playerX;
 var playerY;
 var playerWidth;
 var playerHeight;
-var playerSpeed;
-
-var ballX;
-var ballY;
-var velocityX;
-var velocityY;
-var ballRadius;
+var runSpeed;
 
 var buildingsArray = [];
 var timeSinceLastBuilding;
@@ -27,19 +21,12 @@ var buildingHeight;
 function init() {
     previousDate = performance.now();
 
-    playerX = canvas.width * 0.5;
-    playerY = canvas.height * 0.5;
-    playerWidth = 200;
-    playerHeight = 350;
-    playerSpeed = 0.4;
+    playerWidth = canvas.width * 0.1;
+    playerHeight = playerWidth * 2;
+    playerX = canvas.width * 0.1;
+    playerY = canvas.height * 0.5 - playerHeight;
 
-    ballX = canvas.width * 0.5;
-    ballY = canvas.height - 200;
-    velocityX = 0.2;
-    velocityY = 0.3;
-    ballRadius = 100;
-
-    timeSinceLastBuilding = 1000;
+    timeSinceLastBuilding = 1750;
     runSpeed = 0.5;
 
     buildingsArray.push({
@@ -56,46 +43,25 @@ function init() {
     document.addEventListener("keyup", keyUpHandler, false);
     document.addEventListener("touchstart", touchStartHandler, false);
     document.addEventListener("touchend", touchEndHandler, false);
+
+    ctx.font = "100px Arial";
 }
 
 function update() {
-    ballX += velocityX * deltaTime;
-    ballY += velocityY * deltaTime;
-
-    if (ballX < ballRadius) {
-        velocityX = Math.abs(velocityX);
-    }
-    if (ballX > canvas.width - ballRadius) {
-        velocityX = -Math.abs(velocityX);
-    }
-    if (ballY < ballRadius) {
-        velocityY = Math.abs(velocityY);
-    }
-    if (ballY > canvas.height - ballRadius) {
-        velocityY = -Math.abs(velocityY);
-    }
-
-    if (rightPressed && playerX < canvas.width - playerWidth) {
-        playerX += playerSpeed * deltaTime;
-    }
-    if (leftPressed && playerX > 0) {
-        playerX -= playerSpeed * deltaTime;
-    }
-
     timeSinceLastBuilding += deltaTime;
     if (timeSinceLastBuilding > 2500) {
-        timeSinceLastBuilding = Math.random() * 750;
         buildingsArray.push({
             x: canvas.width * 1.5,
             y: (Math.random() * canvas.height * 0.5 + (canvas.height * 0.25)),
-            width: Math.random() * canvas.width * 0.3 + canvas.width * 0.35,
+            width: Math.random() * canvas.width * 0.45 + canvas.width * 0.25,
             height: canvas.height
         });
+        timeSinceLastBuilding = Math.random() * 750;
     }
 
     for (var i = 0; i < buildingsArray.length; i++) {
         buildingsArray[i].x -= deltaTime * runSpeed;
-        if (buildingsArray[i].x < -canvas.width * 0.5) {
+        if (buildingsArray[i].x < -canvas.width) {
             buildingsArray.splice(i, 1);
         }
     }
@@ -103,18 +69,6 @@ function update() {
 
 function render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    ctx.beginPath();
-    ctx.arc(ballX, ballY, ballRadius, 0, Math.PI*2);
-    ctx.fillStyle = "#ff0000";
-    ctx.fill();
-    ctx.closePath();
-
-    ctx.beginPath();
-    ctx.rect(playerX, playerY, playerWidth, playerHeight);
-    ctx.fillStyle = "#0000ff";
-    ctx.fill();
-    ctx.closePath();
 
     for (var i = 0; i < buildingsArray.length; i++) {
         var building = buildingsArray[i];
@@ -124,6 +78,14 @@ function render() {
         ctx.fill();
         ctx.closePath();
     }
+
+    ctx.beginPath();
+    ctx.rect(playerX, playerY, playerWidth, playerHeight);
+    ctx.fillStyle = "#0000ff";
+    ctx.fill();
+    ctx.closePath();
+
+    ctx.strokeText("Buildings: " + buildingsArray.length, 10, 50);
 }
 
 function keyDownHandler(e) {
