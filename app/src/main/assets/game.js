@@ -13,6 +13,7 @@ var playerX;
 var playerY;
 var playerWidth;
 var playerHeight;
+var health;
 
 var isJumping;
 var jumpHeldTime;
@@ -37,6 +38,7 @@ function init() {
     playerHeight = playerWidth * 1.75;
     playerX = canvas.width * 0.1;
     playerY = canvas.height * 0.5 - playerHeight;
+    health = 3;
 
     isJumping = false;
     jumpHeldTime = 0;
@@ -75,11 +77,11 @@ function update() {
         var newBuilding = {
             x: canvas.width * 1.5,
             y: (Math.random() * canvas.height * 0.5 + (canvas.height * 0.25)),
-            width: Math.random() * canvas.width * 0.45 + canvas.width * 0.25,
+            width: Math.random() * canvas.width * 0.6 + canvas.width * 0.25,
             height: canvas.height
         };
         buildingsArray.push(newBuilding);
-        if (newBuilding.width > canvas.width * 0.35 && Math.random() > 0.6) {
+        if (newBuilding.width > canvas.width * 0.4 && Math.random() > 0.6) {
             enemyArray.push({
                 x: newBuilding.x + newBuilding.width * 0.5 - enemyWidth * 0.5,
                 y: newBuilding.y - enemyHeight
@@ -109,7 +111,21 @@ function update() {
     }
 
     for (var i = 0; i < enemyArray.length; i++) {
-        enemyArray[i].x -= deltaTime * runSpeed;
+        var enemy = enemyArray[i];
+        enemy.x -= deltaTime * runSpeed
+
+        if (playerY + playerHeight > enemy.y &&
+            playerY < enemy.y + enemyHeight &&
+            playerX + playerWidth > enemy.x &&
+            playerX < enemy.x + enemyWidth)
+        {
+            health--;
+            enemyArray.splice(i, 1);
+            if (health <= 0) {
+                init();
+            }
+        }
+
         if (enemyArray[i].x < -building.width) {
             enemyArray.splice(i, 1);
         }
@@ -171,7 +187,7 @@ function render() {
     ctx.fill();
     ctx.closePath();
 
-    ctx.strokeText("Enemies: " + enemyArray.length, 10, 100);
+    ctx.strokeText("Health: " + health, 20, 100);
 }
 
 function keyDownHandler(e) {
