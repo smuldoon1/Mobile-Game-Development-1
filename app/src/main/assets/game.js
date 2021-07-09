@@ -61,8 +61,8 @@ function init() {
 
     gravity = 8.88 / canvas.height;
     initialVelocity = 296 / canvas.height;
-    initialJumpForce = -3552 / canvas.height;
-    jumpFoldForce = 74 / canvas.height;
+    initialJumpForce = -3400 / canvas.height;
+    jumpFoldForce = 70 / canvas.height;
 
     velocity = initialVelocity;
 
@@ -73,9 +73,9 @@ function init() {
     fireballSpeed = 1728 / canvas.width;
 
     buildingsArray = [];
-    timeSinceLastBuilding = 1600000 / canvas.width;
-    maxTimeSinceLastBuilding = 2200000 / canvas.width;
-    buildingGap = 1080000 / canvas.width;
+    timeSinceLastBuilding = 1000;//200000 / canvas.width;
+    maxTimeSinceLastBuilding = 1500;// 2200000 / canvas.width;
+    buildingGap = 900;//1200000 / canvas.width;
 
     buildingsArray.push({
         x: canvas.width * 0,
@@ -100,23 +100,23 @@ function init() {
 }
 
 function update() {
-    timeSinceLastBuilding += deltaTime;
     if (timeSinceLastBuilding > maxTimeSinceLastBuilding) {
         var newBuilding = {
             x: canvas.width * 1.5,
-            y: (Math.random() * canvas.height * 0.5 + (canvas.height * 0.25)),
+            y: (Math.random() * canvas.height * 0.4 + (canvas.height * 0.25)),
             width: Math.random() * canvas.width * 0.6 + canvas.width * 0.25,
             height: canvas.height
         };
         buildingsArray.push(newBuilding);
         if (newBuilding.width > canvas.width * 0.4 && Math.random() > 0.6) {
             enemyArray.push({
-                x: newBuilding.x + newBuilding.width * 0.5 - enemyWidth * 0.5,
+                x: newBuilding.x + newBuilding.width * 0.75 - enemyWidth * 0.5,
                 y: newBuilding.y - enemyHeight
             });
         }
-        timeSinceLastBuilding = Math.random() * buildingGap; // Make relative to screen size !!!
+        timeSinceLastBuilding = (Math.random() * buildingGap) - newBuilding.width; // Make relative to screen size !!!
     }
+    timeSinceLastBuilding += deltaTime;
 
     var isGrounded = false;
     for (var i = 0; i < buildingsArray.length; i++) {
