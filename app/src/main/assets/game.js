@@ -16,6 +16,7 @@ var playerHeight;
 
 var isJumping;
 var jumpHeldTime;
+var maxJumpHoldTime;
 var jumps;
 var runSpeed;
 var velocity;
@@ -25,16 +26,21 @@ var timeSinceLastBuilding;
 var buildingWidth;
 var buildingHeight;
 
+var enemyArray;
+var enemyWidth;
+var enemyHeight;
+
 function init() {
     previousDate = performance.now();
 
     playerWidth = canvas.width * 0.1;
-    playerHeight = playerWidth * 2;
+    playerHeight = playerWidth * 1.75;
     playerX = canvas.width * 0.1;
     playerY = canvas.height * 0.5 - playerHeight;
 
     isJumping = false;
     jumpHeldTime = 0;
+    maxJumpHoldTime = 300;
     jumps = 2;
     runSpeed = 0.5;
     velocity = 0.1;
@@ -47,6 +53,10 @@ function init() {
         width: canvas.width * 1.5,
         height: canvas.height
     });
+
+    enemyArray = []
+    enemyWidth = canvas.width * 0.09;
+    enemyHeight = enemyWidth * 2;
 
     rightPressed = false;
     leftPressed = false;
@@ -62,12 +72,19 @@ function init() {
 function update() {
     timeSinceLastBuilding += deltaTime;
     if (timeSinceLastBuilding > 2500) {
-        buildingsArray.push({
+        var newBuilding = {
             x: canvas.width * 1.5,
             y: (Math.random() * canvas.height * 0.5 + (canvas.height * 0.25)),
             width: Math.random() * canvas.width * 0.45 + canvas.width * 0.25,
             height: canvas.height
-        });
+        };
+        buildingsArray.push(newBuilding);
+        if (newBuilding.width > canvas.width * 0.35 && Math.random() > 0.6) {
+            enemyArray.push({
+                x: newBuilding.x + newBuilding.width * 0.5 - enemyWidth * 0.5,
+                y: newBuilding.y - enemyHeight
+            });
+        }
         timeSinceLastBuilding = Math.random() * 750;
     }
 
@@ -91,6 +108,13 @@ function update() {
         }
     }
 
+    for (var i = 0; i < enemyArray.length; i++) {
+        enemyArray[i].x -= deltaTime * runSpeed;
+        if (enemyArray[i].x < -building.width) {
+            enemyArray.splice(i, 1);
+        }
+    }
+
     if (isGrounded) {
         jumps = 2;
         velocity = 0.1;
@@ -104,8 +128,8 @@ function update() {
     }
 
     if (leftPressed) {
-        if (isJumping && jumpHeldTime < 200) {
-            velocity -= 0.035 * (jumpHeldTime / 200);
+        if (isJumping && jumpHeldTime < maxJumpHoldTime) {
+            velocity -= 0.025 * (jumpHeldTime / maxJumpHoldTime);
             jumpHeldTime += deltaTime;
         }
     }
@@ -131,13 +155,23 @@ function render() {
         ctx.closePath();
     }
 
+
+    for (var i = 0; i < enemyArray.length; i++) {
+        var enemy = enemyArray[i];
+        ctx.beginPath();
+        ctx.rect(enemy.x, enemy.y, enemyWidth, enemyHeight);
+        ctx.fillStyle = "#ff0000";
+        ctx.fill();
+        ctx.closePath();
+    }
+
     ctx.beginPath();
     ctx.rect(playerX, playerY, playerWidth, playerHeight);
     ctx.fillStyle = "#0000ff";
     ctx.fill();
     ctx.closePath();
 
-    ctx.strokeText("Jumps: " + jumps, 10, 100);
+    ctx.strokeText("Enemies: " + enemyArray.length, 10, 100);
 }
 
 function keyDownHandler(e) {
@@ -185,7 +219,7 @@ function jump() {
     if (jumps > 0 && !isJumping) {
         isJumping = true;
         jumps--;
-        velocity = -1.25;
+        velocity = -1.2;
     }
 }
 
@@ -201,5 +235,5 @@ function gameLoop() {
 // Sets up game variables
 init();
 
-// Starts the game loop so the input, update and render functions are called every millisecond
-gameLoopInterval = setInterval(gameLoop, 1);
+// Starts the game loop so the input, update and render functions are called every 10 milliseconds
+gameLoopInterval = setInterval(gameLoop, 10);
