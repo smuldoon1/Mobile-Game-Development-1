@@ -22,6 +22,11 @@ var jumps;
 var runSpeed;
 var velocity;
 
+var fireballArray;
+var fireballCooldown;
+var fireballRadius;
+var fireballSpeed;
+
 var buildingsArray;
 var timeSinceLastBuilding;
 var buildingWidth;
@@ -47,6 +52,11 @@ function init() {
     runSpeed = 0.5;
     velocity = 0.1;
 
+    fireballArray = [];
+    fireballCooldown = 0;
+    fireballRadius = canvas.width * 0.025;
+    fireballSpeed = 1.2;
+
     buildingsArray = [];
     timeSinceLastBuilding = 1750;
     buildingsArray.push({
@@ -56,7 +66,7 @@ function init() {
         height: canvas.height
     });
 
-    enemyArray = []
+    enemyArray = [];
     enemyWidth = canvas.width * 0.09;
     enemyHeight = enemyWidth * 2;
 
@@ -112,7 +122,7 @@ function update() {
 
     for (var i = 0; i < enemyArray.length; i++) {
         var enemy = enemyArray[i];
-        enemy.x -= deltaTime * runSpeed
+        enemy.x -= deltaTime * runSpeed;
 
         if (playerY + playerHeight > enemy.y &&
             playerY < enemy.y + enemyHeight &&
@@ -126,8 +136,36 @@ function update() {
             }
         }
 
-        if (enemyArray[i].x < -building.width) {
+        if (enemy.x < -building.width) {
             enemyArray.splice(i, 1);
+        }
+    }
+
+    for (var i = 0; i < fireballArray.length; i++) {
+        var fireball = fireballArray[i];
+        fireball.x += deltaTime * fireballSpeed;
+
+        if (fireball.x > canvas.width) {
+            fireballArray.splice(i, 1);
+        }
+
+        for (var j = 0; j < enemyArray.length; j++) {
+            var enemy = enemyArray[j];
+            if (fireball.y + fireballRadius * 2 > enemy.y &&
+                fireball.y < enemy.y + enemyHeight &&
+                fireball.x + fireballRadius * 2 > enemy.x &&
+                fireball.x < enemy.x + enemyWidth)
+            {
+                fireballArray.splice(i, 1);
+                enemyArray.splice(j, 1);
+            }
+        }
+    }
+
+    if (fireballCooldown > 0) {
+        fireballCooldown -= deltaTime;
+        if (fireballCooldown < 0) {
+            fireballCooldown = 0;
         }
     }
 
@@ -181,6 +219,15 @@ function render() {
         ctx.closePath();
     }
 
+    for (var i = 0; i < fireballArray.length; i++) {
+        var fireball = fireballArray[i];
+        ctx.beginPath();
+        ctx.arc(fireball.x, fireball.y, fireballRadius, 0, Math.PI * 2);
+        ctx.fillStyle = "#fc8b0a";
+        ctx.fill();
+        ctx.closePath();
+    }
+
     ctx.beginPath();
     ctx.rect(playerX, playerY, playerWidth, playerHeight);
     ctx.fillStyle = "#0000ff";
@@ -188,6 +235,7 @@ function render() {
     ctx.closePath();
 
     ctx.strokeText("Health: " + health, 20, 100);
+    ctx.strokeText("Cooldown: " + fireballCooldown, 20, 210);
 }
 
 function keyDownHandler(e) {
@@ -220,6 +268,7 @@ function touchStartHandler(e) {
         if (touches[i].pageX >= canvas.width * 0.18) {
             rightPressed = true;
             leftPressed = false;
+            attack();
         }
     }
 }
@@ -236,6 +285,16 @@ function jump() {
         isJumping = true;
         jumps--;
         velocity = -1.2;
+    }
+}
+
+function attack() {
+    if (fireballCooldown <= 0) {
+        fireballCooldown = 1000;
+        fireballArray.push({
+            x: playerX + playerWidth * 1.1,
+            y: playerY + playerHeight * 0.3
+        });
     }
 }
 
