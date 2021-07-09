@@ -20,7 +20,13 @@ var jumpHeldTime;
 var maxJumpHoldTime;
 var jumps;
 var runSpeed;
+
 var velocity;
+
+var gravity;
+var initialVelocity;
+var initialJumpForce;
+var jumpFoldForce;
 
 var fireballArray;
 var fireballCooldown;
@@ -29,6 +35,8 @@ var fireballSpeed;
 
 var buildingsArray;
 var timeSinceLastBuilding;
+var maxTimeSinceLastBuilding;
+var buildingGap;
 var buildingWidth;
 var buildingHeight;
 
@@ -49,16 +57,26 @@ function init() {
     jumpHeldTime = 0;
     maxJumpHoldTime = 300;
     jumps = 2;
-    runSpeed = 0.5;
-    velocity = 0.1;
+    runSpeed = 720 / canvas.width;
+
+    gravity = 8.88 / canvas.height;
+    initialVelocity = 296 / canvas.height;
+    initialJumpForce = -3552 / canvas.height;
+    jumpFoldForce = 74 / canvas.height;
+
+    velocity = initialVelocity;
 
     fireballArray = [];
     fireballCooldown = 0;
+    fireballCooldownTimer = 700;
     fireballRadius = canvas.width * 0.025;
-    fireballSpeed = 1.2;
+    fireballSpeed = 1728 / canvas.width;
 
     buildingsArray = [];
-    timeSinceLastBuilding = 1750;
+    timeSinceLastBuilding = 1600000 / canvas.width;
+    maxTimeSinceLastBuilding = 2200000 / canvas.width;
+    buildingGap = 1080000 / canvas.width;
+
     buildingsArray.push({
         x: canvas.width * 0,
         y: canvas.height * 0.5,
@@ -83,7 +101,7 @@ function init() {
 
 function update() {
     timeSinceLastBuilding += deltaTime;
-    if (timeSinceLastBuilding > 2500) {
+    if (timeSinceLastBuilding > maxTimeSinceLastBuilding) {
         var newBuilding = {
             x: canvas.width * 1.5,
             y: (Math.random() * canvas.height * 0.5 + (canvas.height * 0.25)),
@@ -97,7 +115,7 @@ function update() {
                 y: newBuilding.y - enemyHeight
             });
         }
-        timeSinceLastBuilding = Math.random() * 750;
+        timeSinceLastBuilding = Math.random() * buildingGap; // Make relative to screen size !!!
     }
 
     var isGrounded = false;
@@ -171,19 +189,19 @@ function update() {
 
     if (isGrounded) {
         jumps = 2;
-        velocity = 0.1;
+        velocity = initialVelocity;
     }
     else {
         if (jumps == 2) {
             jumps = 1;
         }
-        velocity += deltaTime * 0.003;
+        velocity += deltaTime * gravity;
         playerY += velocity * deltaTime;
     }
 
     if (leftPressed) {
         if (isJumping && jumpHeldTime < maxJumpHoldTime) {
-            velocity -= 0.025 * (jumpHeldTime / maxJumpHoldTime);
+            velocity -= jumpFoldForce * (jumpHeldTime / maxJumpHoldTime);
             jumpHeldTime += deltaTime;
         }
     }
@@ -235,7 +253,6 @@ function render() {
     ctx.closePath();
 
     ctx.strokeText("Health: " + health, 20, 100);
-    ctx.strokeText("Cooldown: " + fireballCooldown, 20, 210);
 }
 
 function keyDownHandler(e) {
@@ -284,13 +301,13 @@ function jump() {
     if (jumps > 0 && !isJumping) {
         isJumping = true;
         jumps--;
-        velocity = -1.2;
+        velocity = initialJumpForce;
     }
 }
 
 function attack() {
     if (fireballCooldown <= 0) {
-        fireballCooldown = 1000;
+        fireballCooldown = fireballCooldownTimer;
         fireballArray.push({
             x: playerX + playerWidth * 1.1,
             y: playerY + playerHeight * 0.3
