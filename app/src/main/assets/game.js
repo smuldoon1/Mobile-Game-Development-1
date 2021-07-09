@@ -264,24 +264,6 @@ function render() {
     ctx.strokeText("ID: " + gameLoopInterval, 30, 320);
 }
 
-function keyDownHandler(e) {
-    if (e.key == "Right" || e.key == "ArrowRight") {
-        rightPressed = true;
-    }
-    if (e.key == "Left" || e.key == "ArrowLeft") {
-        leftPressed = true;
-    }
-}
-
-function keyUpHandler(e) {
-    if (e.key == "Right" || e.key == "ArrowRight") {
-        rightPressed = false;
-    }
-    if (e.key == "Left" || e.key == "ArrowLeft") {
-        leftPressed = false;
-    }
-}
-
 function touchStartHandler(e) {
     var touches = e.touches;
 
