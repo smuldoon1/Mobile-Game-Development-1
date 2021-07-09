@@ -13,7 +13,9 @@ var playerX;
 var playerY;
 var playerWidth;
 var playerHeight;
+
 var health;
+var score;
 
 var isJumping;
 var jumpHeldTime;
@@ -51,7 +53,9 @@ function init() {
     playerHeight = playerWidth * 1.75;
     playerX = canvas.width * 0.1;
     playerY = canvas.height * 0.5 - playerHeight;
+
     health = 3;
+    score = 0;
 
     isJumping = false;
     jumpHeldTime = 0;
@@ -150,7 +154,7 @@ function update() {
             health--;
             enemyArray.splice(i, 1);
             if (health <= 0) {
-                init();
+                die();
             }
         }
 
@@ -176,6 +180,7 @@ function update() {
             {
                 fireballArray.splice(i, 1);
                 enemyArray.splice(j, 1);
+                score += 50;
             }
         }
     }
@@ -211,8 +216,10 @@ function update() {
     }
 
     if (playerY > canvas.height) {
-        init();
+        die();
     }
+
+    score += deltaTime * 0.01;
 }
 
 function render() {
@@ -252,7 +259,9 @@ function render() {
     ctx.fill();
     ctx.closePath();
 
-    ctx.strokeText("Health: " + health, 20, 100);
+    ctx.strokeText("Health: " + health, 30, 100);
+    ctx.strokeText("Score: " + Math.round(score), 30, 210);
+    ctx.strokeText("ID: " + gameLoopInterval, 30, 320);
 }
 
 function keyDownHandler(e) {
@@ -315,6 +324,10 @@ function attack() {
     }
 }
 
+function die() {
+    clearInterval(gameLoopInterval);
+}
+
 function gameLoop() {
     var dateNow = performance.now();
     deltaTime = dateNow - previousDate;
@@ -327,5 +340,5 @@ function gameLoop() {
 // Sets up game variables
 init();
 
-// Starts the game loop so the input, update and render functions are called every 10 milliseconds
-gameLoopInterval = setInterval(gameLoop, 10);
+// Starts the game loop so the update and render functions are called every 10 milliseconds
+var gameLoopInterval = setInterval(gameLoop, 10);
