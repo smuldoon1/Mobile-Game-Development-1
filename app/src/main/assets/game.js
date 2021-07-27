@@ -1,6 +1,8 @@
 var canvas = document.getElementById("gameCanvas");
 var ctx = canvas.getContext("2d");
 
+var playerSprite = document.getElementById('playerSprite');
+
 var scene = "main_menu";
 
 var previousDate;
@@ -95,8 +97,6 @@ function init() {
     rightPressed = false;
     leftPressed = false;
 
-    document.addEventListener("keydown", keyDownHandler, false);
-    document.addEventListener("keyup", keyUpHandler, false);
     document.addEventListener("touchstart", touchStartHandler, false);
     document.addEventListener("touchend", touchEndHandler, false);
 
@@ -127,7 +127,7 @@ function update() {
         var building = buildingsArray[i];
         building.x -= deltaTime * runSpeed;
 
-        if (playerY + playerHeight < building.y + 20 &&
+        if (playerY + playerHeight < building.y + 30 &&
             playerY + playerHeight > building.y - 10 &&
             playerX + playerWidth >= building.x &&
             playerX <= building.x + building.width &&
@@ -253,15 +253,17 @@ function render() {
         ctx.closePath();
     }
 
+/*
     ctx.beginPath();
     ctx.rect(playerX, playerY, playerWidth, playerHeight);
     ctx.fillStyle = "#0000ff";
     ctx.fill();
     ctx.closePath();
+    */
+    ctx.drawImage(playerSprite, playerX, playerY, playerWidth, playerHeight);
 
     ctx.strokeText("Health: " + health, 30, 100);
     ctx.strokeText("Score: " + Math.round(score), 30, 210);
-    ctx.strokeText("ID: " + gameLoopInterval, 30, 320);
 }
 
 function touchStartHandler(e) {
