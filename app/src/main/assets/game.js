@@ -3,6 +3,7 @@ var ctx = canvas.getContext("2d");
 
 var playerRunning = document.getElementById('playerRunning');
 var playerJumping = document.getElementById('playerJumping');
+var playerDeath = document.getElementById('playerDeath');
 var enemySprite = document.getElementById('enemy');
 var fireballSprite = document.getElementById('fireball');
 var background = document.getElementById('background');
@@ -27,6 +28,7 @@ var playerAnimationFrame;
 
 var health;
 var score;
+var isDead;
 
 var isJumping;
 var isGrounded;
@@ -81,6 +83,7 @@ function init() {
 
     health = 3;
     score = 0;
+    isDead = false;
 
     isJumping = false;
     isGrounded = true;
@@ -155,7 +158,9 @@ function update() {
     isGrounded = false;
     for (var i = 0; i < buildingsArray.length; i++) {
         var building = buildingsArray[i];
-        building.x -= deltaTime * runSpeed;
+
+        if (!isDead)
+            building.x -= deltaTime * runSpeed;
 
         if (playerY + playerHeight < building.y + 30 &&
             playerY + playerHeight > building.y - 10 &&
@@ -174,7 +179,9 @@ function update() {
 
     for (var i = 0; i < enemyArray.length; i++) {
         var enemy = enemyArray[i];
-        enemy.x -= deltaTime * runSpeed;
+
+        if (!isDead)
+            enemy.x -= deltaTime * runSpeed;
 
         if (playerY + playerHeight > enemy.y &&
             playerY < enemy.y + enemyHeight &&
@@ -249,17 +256,28 @@ function update() {
         die();
     }
 
-    backgroundScroll += deltaTime * 0.025;
-    if (backgroundScroll > background.width * 0.5) {
-        backgroundScroll -= background.width * 0.5;
+    if (!isDead) {
+        backgroundScroll += deltaTime * 0.025;
+        if (backgroundScroll > background.width * 0.5) {
+            backgroundScroll -= background.width * 0.5;
+        }
     }
 
     playerAnimationTime += deltaTime;
-    if (playerAnimationTime >= 100) {
-        playerAnimationTime = 0;
-        playerAnimationFrame++;
-        if (playerAnimationFrame > 5) {
-            playerAnimationFrame = 0;
+    if (isDead) {
+        if (playerAnimationTime >= 100 && playerAnimationFrame < 5) {
+            playerAnimationTime = 0;
+            playerAnimationFrame++;
+        }
+    }
+    else
+    {
+        if (playerAnimationTime >= 100) {
+            playerAnimationTime = 0;
+            playerAnimationFrame++;
+            if (playerAnimationFrame > 5) {
+                playerAnimationFrame = 0;
+            }
         }
     }
 
@@ -281,7 +299,8 @@ function update() {
         }
     }
 
-    score += deltaTime * 0.01;
+    if (!isDead)
+        score += deltaTime * 0.01;
 }
 
 function render() {
@@ -308,7 +327,10 @@ function render() {
         ctx.drawImage(fireballSprite, fireballAnimtionFrame * 64, 0, 64, 64, fireball.x, fireball.y, fireballSize * 4, fireballSize * 4);
     }
 
-    if (isGrounded) {
+    if (isDead) {
+        ctx.drawImage(playerDeath, playerAnimationFrame * 23, 0, 23, 35, playerX, playerY, playerWidth, playerHeight);
+    }
+    else if (isGrounded) {
         ctx.drawImage(playerRunning, playerAnimationFrame * 32, 0, 32, 32, playerX, playerY, playerWidth, playerHeight);
     }
     else {
@@ -362,7 +384,8 @@ function attack() {
 }
 
 function die() {
-    clearInterval(gameLoopInterval);
+    isDead = true;
+    //clearInterval(gameLoopInterval);
 }
 
 function getJumpIndex(velocity) {
