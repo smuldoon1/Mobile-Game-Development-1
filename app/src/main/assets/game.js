@@ -1,7 +1,8 @@
 var canvas = document.getElementById("gameCanvas");
 var ctx = canvas.getContext("2d");
 
-var playerSprite = document.getElementById('playerSprite');
+var playerRunning = document.getElementById('playerRunning');
+var playerJumping = document.getElementById('playerJumping');
 
 var scene = "main_menu";
 
@@ -23,6 +24,7 @@ var health;
 var score;
 
 var isJumping;
+var isGrounded;
 var jumpHeldTime;
 var maxJumpHoldTime;
 var jumps;
@@ -66,6 +68,7 @@ function init() {
     score = 0;
 
     isJumping = false;
+    isGrounded = true;
     jumpHeldTime = 0;
     maxJumpHoldTime = 300;
     jumps = 2;
@@ -128,7 +131,7 @@ function update() {
     }
     timeSinceLastBuilding += deltaTime;
 
-    var isGrounded = false;
+    isGrounded = false;
     for (var i = 0; i < buildingsArray.length; i++) {
         var building = buildingsArray[i];
         building.x -= deltaTime * runSpeed;
@@ -267,10 +270,16 @@ function render() {
         ctx.closePath();
     }
 
-    ctx.drawImage(playerSprite, animationIndex * 32, 0, 32, 32, playerX, playerY, playerWidth, playerHeight);
+    if (isGrounded) {
+        ctx.drawImage(playerRunning, animationIndex * 32, 0, 32, 32, playerX, playerY, playerWidth, playerHeight);
+    }
+    else {
+        ctx.drawImage(playerJumping, getJumpIndex(velocity) * 31, 0, 31, 33, playerX, playerY, playerWidth, playerHeight);
+    }
 
     ctx.strokeText("Health: " + health, 30, 100);
     ctx.strokeText("Score: " + Math.round(score), 30, 210);
+    ctx.strokeText("Velocity: " + velocity, 30, 320);
 }
 
 function touchStartHandler(e) {
@@ -317,6 +326,21 @@ function attack() {
 
 function die() {
     clearInterval(gameLoopInterval);
+}
+
+function getJumpIndex(velocity) {
+    if (velocity < -0.2) {
+        return 0;
+    }
+    else if (velocity < 0) {
+        return 1;
+    }
+    else if (velocity < 0.5) {
+        return 2;
+    }
+    else {
+        return 3;
+    }
 }
 
 function gameLoop() {
