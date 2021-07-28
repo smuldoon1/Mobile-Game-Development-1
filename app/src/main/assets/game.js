@@ -4,6 +4,8 @@ var ctx = canvas.getContext("2d");
 var playerRunning = document.getElementById('playerRunning');
 var playerJumping = document.getElementById('playerJumping');
 var enemySprite = document.getElementById('enemy');
+var fireballSprite = document.getElementById('fireball');
+var background = document.getElementById('background');
 
 var scene = "main_menu";
 
@@ -18,8 +20,8 @@ var playerY;
 var playerWidth;
 var playerHeight;
 
-var animationTime;
-var animationIndex;
+var playerAnimationTime;
+var playerAnimationFrame;
 
 var health;
 var score;
@@ -40,8 +42,11 @@ var jumpFoldForce;
 
 var fireballArray;
 var fireballCooldown;
-var fireballRadius;
+var fireballSize;
 var fireballSpeed;
+
+var fireballAnimationTime;
+var fireballAnimtionFrame;
 
 var buildingsArray;
 var timeSinceLastBuilding;
@@ -55,7 +60,7 @@ var enemyWidth;
 var enemyHeight;
 
 var enemyAnimationTime;
-var enemyAnimationIndex;
+var enemyAnimationFrame;
 
 function init() {
     previousDate = performance.now();
@@ -67,8 +72,8 @@ function init() {
     playerX = canvas.width * 0.1;
     playerY = canvas.height * 0.5 - playerHeight;
 
-    animationTime = 0;
-    animationIndex = 0;
+    playerAnimationTime = 0;
+    playerAnimationFrame = 0;
 
     health = 3;
     score = 0;
@@ -90,8 +95,11 @@ function init() {
     fireballArray = [];
     fireballCooldown = 0;
     fireballCooldownTimer = 700;
-    fireballRadius = canvas.width * 0.025;
+    fireballSize = canvas.width * 0.1;
     fireballSpeed = 1728 / canvas.width;
+
+    fireballAnimationTime = 0;
+    fireballAnimtionFrame = 0;
 
     buildingsArray = [];
     timeSinceLastBuilding = 1000;//200000 / canvas.width;
@@ -110,7 +118,7 @@ function init() {
     enemyHeight = enemyWidth * 1.8333;
 
     enemyAnimationTime = 0;
-    enemyAnimationIndex = 0;
+    enemyAnimationFrame = 0;
 
     rightPressed = false;
     leftPressed = false;
@@ -191,9 +199,9 @@ function update() {
 
         for (var j = 0; j < enemyArray.length; j++) {
             var enemy = enemyArray[j];
-            if (fireball.y + fireballRadius * 2 > enemy.y &&
+            if (fireball.y + fireballSize > enemy.y &&
                 fireball.y < enemy.y + enemyHeight &&
-                fireball.x + fireballRadius * 2 > enemy.x &&
+                fireball.x + fireballSize * 2 > enemy.x &&
                 fireball.x < enemy.x + enemyWidth)
             {
                 fireballArray.splice(i, 1);
@@ -237,21 +245,30 @@ function update() {
         die();
     }
 
-    animationTime += deltaTime;
-    if (animationTime >= 100) {
-        animationTime = 0;
-        animationIndex++;
-        if (animationIndex > 5) {
-            animationIndex = 0;
+    playerAnimationTime += deltaTime;
+    if (playerAnimationTime >= 100) {
+        playerAnimationTime = 0;
+        playerAnimationFrame++;
+        if (playerAnimationFrame > 5) {
+            playerAnimationFrame = 0;
+        }
+    }
+
+    fireballAnimationTime += deltaTime;
+    if (fireballAnimationTime >= 200) {
+        fireballAnimationTime = 0;
+        fireballAnimtionFrame++;
+        if (fireballAnimtionFrame > 3) {
+            fireballAnimtionFrame = 0;
         }
     }
 
     enemyAnimationTime += deltaTime;
-    if (enemyAnimationTime >= 100) {
+    if (enemyAnimationTime >= 150) {
         enemyAnimationTime = 0;
-        enemyAnimationIndex++;
-        if (enemyAnimationIndex > 3) {
-            enemyAnimationIndex = 0;
+        enemyAnimationFrame++;
+        if (enemyAnimationFrame > 3) {
+            enemyAnimationFrame = 0;
         }
     }
 
@@ -261,31 +278,29 @@ function update() {
 function render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
+
     for (var i = 0; i < buildingsArray.length; i++) {
         var building = buildingsArray[i];
         ctx.beginPath();
         ctx.rect(building.x, building.y, building.width, building.height);
-        ctx.fillStyle = "#00ff00";
+        ctx.fillStyle = "#693996";
         ctx.fill();
         ctx.closePath();
     }
 
     for (var i = 0; i < enemyArray.length; i++) {
         var enemy = enemyArray[i];
-        ctx.drawImage(enemySprite, enemyAnimationIndex * 18, 0, 18, 33, enemy.x, enemy.y, enemyWidth, enemyHeight);
+        ctx.drawImage(enemySprite, enemyAnimationFrame * 18, 0, 18, 33, enemy.x, enemy.y, enemyWidth, enemyHeight);
     }
 
     for (var i = 0; i < fireballArray.length; i++) {
         var fireball = fireballArray[i];
-        ctx.beginPath();
-        ctx.arc(fireball.x, fireball.y, fireballRadius, 0, Math.PI * 2);
-        ctx.fillStyle = "#fc8b0a";
-        ctx.fill();
-        ctx.closePath();
+        ctx.drawImage(fireballSprite, fireballAnimtionFrame * 64, 0, 64, 64, fireball.x, fireball.y, fireballSize, fireballSize);
     }
 
     if (isGrounded) {
-        ctx.drawImage(playerRunning, animationIndex * 32, 0, 32, 32, playerX, playerY, playerWidth, playerHeight);
+        ctx.drawImage(playerRunning, playerAnimationFrame * 32, 0, 32, 32, playerX, playerY, playerWidth, playerHeight);
     }
     else {
         ctx.drawImage(playerJumping, getJumpIndex(velocity) * 31, 0, 31, 33, playerX, playerY, playerWidth, playerHeight);
@@ -293,7 +308,6 @@ function render() {
 
     ctx.strokeText("Health: " + health, 30, 100);
     ctx.strokeText("Score: " + Math.round(score), 30, 210);
-    ctx.strokeText("Velocity: " + velocity, 30, 320);
 }
 
 function touchStartHandler(e) {
@@ -332,8 +346,8 @@ function attack() {
     if (fireballCooldown <= 0) {
         fireballCooldown = fireballCooldownTimer;
         fireballArray.push({
-            x: playerX + playerWidth * 1.1,
-            y: playerY + playerHeight * 0.3
+            x: playerX + playerWidth * 1.05,
+            y: playerY + playerHeight * 0.2
         });
     }
 }
