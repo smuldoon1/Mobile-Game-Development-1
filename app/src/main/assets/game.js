@@ -249,9 +249,9 @@ function update() {
         die();
     }
 
-    backgroundScroll += deltaTime * 0.25;
-    if (backgroundScroll > background.width) {
-        backgroundScroll = 0;
+    backgroundScroll += deltaTime * 0.025;
+    if (backgroundScroll > background.width * 0.5) {
+        backgroundScroll -= background.width * 0.5;
     }
 
     playerAnimationTime += deltaTime;
