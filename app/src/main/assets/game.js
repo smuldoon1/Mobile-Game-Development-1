@@ -16,6 +16,9 @@ var playerY;
 var playerWidth;
 var playerHeight;
 
+var animationTime;
+var animationIndex;
+
 var health;
 var score;
 
@@ -51,10 +54,13 @@ var enemyHeight;
 function init() {
     previousDate = performance.now();
 
-    playerWidth = canvas.width * 0.1;
-    playerHeight = playerWidth * 1.75;
+    playerWidth = canvas.width * 0.2;
+    playerHeight = playerWidth;
     playerX = canvas.width * 0.1;
     playerY = canvas.height * 0.5 - playerHeight;
+
+    animationTime = 0;
+    animationIndex = 0;
 
     health = 3;
     score = 0;
@@ -118,7 +124,7 @@ function update() {
                 y: newBuilding.y - enemyHeight
             });
         }
-        timeSinceLastBuilding = (Math.random() * buildingGap) - newBuilding.width; // Make relative to screen size !!!
+        timeSinceLastBuilding = (Math.random() * buildingGap) - newBuilding.width;
     }
     timeSinceLastBuilding += deltaTime;
 
@@ -219,6 +225,15 @@ function update() {
         die();
     }
 
+    animationTime += deltaTime;
+    if (animationTime >= 100) {
+        animationTime = 0;
+        animationIndex++;
+        if (animationIndex > 5) {
+            animationIndex = 0;
+        }
+    }
+
     score += deltaTime * 0.01;
 }
 
@@ -233,7 +248,6 @@ function render() {
         ctx.fill();
         ctx.closePath();
     }
-
 
     for (var i = 0; i < enemyArray.length; i++) {
         var enemy = enemyArray[i];
@@ -253,14 +267,7 @@ function render() {
         ctx.closePath();
     }
 
-/*
-    ctx.beginPath();
-    ctx.rect(playerX, playerY, playerWidth, playerHeight);
-    ctx.fillStyle = "#0000ff";
-    ctx.fill();
-    ctx.closePath();
-    */
-    ctx.drawImage(playerSprite, playerX, playerY, playerWidth, playerHeight);
+    ctx.drawImage(playerSprite, animationIndex * 32, 0, 32, 32, playerX, playerY, playerWidth, playerHeight);
 
     ctx.strokeText("Health: " + health, 30, 100);
     ctx.strokeText("Score: " + Math.round(score), 30, 210);
