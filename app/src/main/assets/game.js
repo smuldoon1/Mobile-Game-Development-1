@@ -288,7 +288,6 @@ function render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     ctx.drawImage(background, backgroundScroll, 0, 400, 729, 0, 0, canvas.width, canvas.height);
-    ctx.drawImage(background, backgroundScroll, 0, 400, 729, 0, 0, canvas.width, canvas.height);
 
     for (var i = 0; i < buildingsArray.length; i++) {
         var building = buildingsArray[i];
