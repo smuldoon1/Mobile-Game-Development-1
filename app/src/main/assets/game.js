@@ -3,6 +3,7 @@ var ctx = canvas.getContext("2d");
 
 var playerRunning = document.getElementById('playerRunning');
 var playerJumping = document.getElementById('playerJumping');
+var enemySprite = document.getElementById('enemy');
 
 var scene = "main_menu";
 
@@ -53,8 +54,13 @@ var enemyArray;
 var enemyWidth;
 var enemyHeight;
 
+var enemyAnimationTime;
+var enemyAnimationIndex;
+
 function init() {
     previousDate = performance.now();
+
+    ctx.imageSmoothingEnabled = false; // Ensures sprites are not drawn blurry
 
     playerWidth = canvas.width * 0.2;
     playerHeight = playerWidth;
@@ -100,8 +106,11 @@ function init() {
     });
 
     enemyArray = [];
-    enemyWidth = canvas.width * 0.09;
-    enemyHeight = enemyWidth * 2;
+    enemyWidth = canvas.width * 0.15;
+    enemyHeight = enemyWidth * 1.8333;
+
+    enemyAnimationTime = 0;
+    enemyAnimationIndex = 0;
 
     rightPressed = false;
     leftPressed = false;
@@ -237,6 +246,15 @@ function update() {
         }
     }
 
+    enemyAnimationTime += deltaTime;
+    if (enemyAnimationTime >= 100) {
+        enemyAnimationTime = 0;
+        enemyAnimationIndex++;
+        if (enemyAnimationIndex > 3) {
+            enemyAnimationIndex = 0;
+        }
+    }
+
     score += deltaTime * 0.01;
 }
 
@@ -254,11 +272,7 @@ function render() {
 
     for (var i = 0; i < enemyArray.length; i++) {
         var enemy = enemyArray[i];
-        ctx.beginPath();
-        ctx.rect(enemy.x, enemy.y, enemyWidth, enemyHeight);
-        ctx.fillStyle = "#ff0000";
-        ctx.fill();
-        ctx.closePath();
+        ctx.drawImage(enemySprite, enemyAnimationIndex * 18, 0, 18, 33, enemy.x, enemy.y, enemyWidth, enemyHeight);
     }
 
     for (var i = 0; i < fireballArray.length; i++) {
