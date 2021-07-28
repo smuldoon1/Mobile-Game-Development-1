@@ -15,6 +15,8 @@ var deltaTime;
 var rightPressed;
 var leftPressed;
 
+var backgroundScroll;
+
 var playerX;
 var playerY;
 var playerWidth;
@@ -67,6 +69,8 @@ function init() {
 
     ctx.imageSmoothingEnabled = false; // Ensures sprites are not drawn blurry
 
+    backgroundScroll = 0;
+
     playerWidth = canvas.width * 0.2;
     playerHeight = playerWidth;
     playerX = canvas.width * 0.1;
@@ -95,7 +99,7 @@ function init() {
     fireballArray = [];
     fireballCooldown = 0;
     fireballCooldownTimer = 700;
-    fireballSize = canvas.width * 0.1;
+    fireballSize = canvas.width * 0.04;
     fireballSpeed = 1728 / canvas.width;
 
     fireballAnimationTime = 0;
@@ -245,6 +249,11 @@ function update() {
         die();
     }
 
+    backgroundScroll += deltaTime * 0.25;
+    if (backgroundScroll > background.width) {
+        backgroundScroll = 0;
+    }
+
     playerAnimationTime += deltaTime;
     if (playerAnimationTime >= 100) {
         playerAnimationTime = 0;
@@ -255,7 +264,7 @@ function update() {
     }
 
     fireballAnimationTime += deltaTime;
-    if (fireballAnimationTime >= 200) {
+    if (fireballAnimationTime >= 80) {
         fireballAnimationTime = 0;
         fireballAnimtionFrame++;
         if (fireballAnimtionFrame > 3) {
@@ -278,7 +287,8 @@ function update() {
 function render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
+    ctx.drawImage(background, backgroundScroll, 0, 400, 729, 0, 0, canvas.width, canvas.height);
+    ctx.drawImage(background, backgroundScroll, 0, 400, 729, 0, 0, canvas.width, canvas.height);
 
     for (var i = 0; i < buildingsArray.length; i++) {
         var building = buildingsArray[i];
@@ -296,7 +306,7 @@ function render() {
 
     for (var i = 0; i < fireballArray.length; i++) {
         var fireball = fireballArray[i];
-        ctx.drawImage(fireballSprite, fireballAnimtionFrame * 64, 0, 64, 64, fireball.x, fireball.y, fireballSize, fireballSize);
+        ctx.drawImage(fireballSprite, fireballAnimtionFrame * 64, 0, 64, 64, fireball.x, fireball.y, fireballSize * 4, fireballSize * 4);
     }
 
     if (isGrounded) {
