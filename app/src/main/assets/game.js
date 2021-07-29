@@ -47,6 +47,7 @@ var jumpHeldTime;
 var maxJumpHoldTime;
 var jumps;
 var runSpeed;
+var speedMultiplier;
 
 var velocity;
 
@@ -100,10 +101,11 @@ function init() {
     maxJumpHoldTime = 300;
     jumps = 2;
     runSpeed = 720 / canvas.width;
+    speedMultiplier = 0.9;
 
     gravity = 8.88 / canvas.height;
     initialVelocity = 296 / canvas.height;
-    initialJumpForce = -3400 / canvas.height;
+    initialJumpForce = -3500 / canvas.height;
     jumpFoldForce = 70 / canvas.height;
 
     velocity = initialVelocity;
@@ -166,14 +168,14 @@ function update() {
         }
         timeSinceLastBuilding = (Math.random() * buildingGap) - newBuilding.width;
     }
-    timeSinceLastBuilding += deltaTime;
+    timeSinceLastBuilding += deltaTime * speedMultiplier;
 
     isGrounded = false;
     for (var i = 0; i < buildingsArray.length; i++) {
         var building = buildingsArray[i];
 
         if (!isPlayerDead)
-            building.x -= deltaTime * runSpeed;
+            building.x -= deltaTime * runSpeed * speedMultiplier;
 
         if (playerY + playerHeight < building.y + 30 &&
             playerY + playerHeight > building.y - 10 &&
@@ -215,12 +217,11 @@ function update() {
         }
     }
 
-
     for (var i = 0; i < enemyArray.length; i++) {
         var enemy = enemyArray[i];
 
         if (!isPlayerDead)
-            enemy.x -= deltaTime * runSpeed;
+            enemy.x -= deltaTime * runSpeed * speedMultiplier;
 
         if (playerY + playerHeight > enemy.y &&
             playerY < enemy.y + enemyHeight &&
@@ -305,7 +306,7 @@ function update() {
     }
 
     if (!isPlayerDead) {
-        backgroundScroll += deltaTime * 0.025;
+        backgroundScroll += deltaTime * 0.025 * speedMultiplier;
         if (backgroundScroll > background.width * 0.5) {
             backgroundScroll -= background.width * 0.5;
         }
@@ -320,7 +321,7 @@ function update() {
     }
     else
     {
-        if (playerAnimationTime >= 100) {
+        if (playerAnimationTime >= 100 / speedMultiplier) {
             playerAnimationTime = 0;
             playerAnimationFrame++;
             if (playerAnimationFrame > 5) {
@@ -341,8 +342,12 @@ function update() {
         }
     }
 
-    if (!isPlayerDead)
-        score += deltaTime * 0.01;
+    if (!isPlayerDead) {
+        score += deltaTime * 0.01 * speedMultiplier;
+        speedMultiplier += deltaTime * 0.0000025;
+        if (speedMultiplier > 1.5)
+            speedMultiplier = 1.5;
+    }
 }
 
 function render() {
@@ -392,6 +397,7 @@ function render() {
 
     ctx.strokeText("Health: " + health, 30, 100);
     ctx.strokeText("Score: " + Math.round(score), 30, 210);
+    ctx.strokeText("x: " + speedMultiplier, 30, 320);
 }
 
 function touchStartHandler(e) {
