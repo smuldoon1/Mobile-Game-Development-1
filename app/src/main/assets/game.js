@@ -5,7 +5,8 @@ var playerRunning = document.getElementById('playerRunning');
 var playerJumping = document.getElementById('playerJumping');
 var playerDeath = document.getElementById('playerDeath');
 var playerAttack = document.getElementById('playerAttack');
-var enemySprite = document.getElementById('enemy');
+var enemyIdle = document.getElementById('enemyIdle');
+var enemyDeath = document.getElementById('enemyDeath');
 var fireballSprite = document.getElementById('fireball');
 var background = document.getElementById('background');
 
@@ -32,7 +33,7 @@ var isPlayingAttackAnimation;
 
 var health;
 var score;
-var isDead;
+var isPlayerDead;
 
 var isJumping;
 var isGrounded;
@@ -67,9 +68,6 @@ var enemyArray;
 var enemyWidth;
 var enemyHeight;
 
-var enemyAnimationTime;
-var enemyAnimationFrame;
-
 function init() {
     previousDate = performance.now();
 
@@ -88,7 +86,7 @@ function init() {
 
     health = 3;
     score = 0;
-    isDead = false;
+    isPlayerDead = false;
 
     isJumping = false;
     isGrounded = true;
@@ -129,9 +127,6 @@ function init() {
     enemyWidth = canvas.width * 0.15;
     enemyHeight = enemyWidth * 1.8333;
 
-    enemyAnimationTime = 0;
-    enemyAnimationFrame = 0;
-
     rightPressed = false;
     leftPressed = false;
 
@@ -156,7 +151,10 @@ function update() {
             enemyArray.push({
                 x: newBuilding.x + newBuilding.width * 0.75 - enemyWidth * 0.5,
                 y: newBuilding.y - enemyHeight,
-                canAttack: true
+                canAttack: true,
+                isDead: false,
+                animationTime: 0,
+                animationFrame: 0
             });
         }
         timeSinceLastBuilding = (Math.random() * buildingGap) - newBuilding.width;
@@ -167,7 +165,7 @@ function update() {
     for (var i = 0; i < buildingsArray.length; i++) {
         var building = buildingsArray[i];
 
-        if (!isDead)
+        if (!isPlayerDead)
             building.x -= deltaTime * runSpeed;
 
         if (playerY + playerHeight < building.y + 30 &&
@@ -182,30 +180,6 @@ function update() {
 
         if (building.x < -building.width) {
             buildingsArray.splice(i, 1);
-        }
-    }
-
-    for (var i = 0; i < enemyArray.length; i++) {
-        var enemy = enemyArray[i];
-
-        if (!isDead)
-            enemy.x -= deltaTime * runSpeed;
-
-        if (playerY + playerHeight > enemy.y &&
-            playerY < enemy.y + enemyHeight &&
-            playerX + playerWidth > enemy.x &&
-            playerX < enemy.x + enemyWidth &&
-            enemy.canAttack == true)
-        {
-            health--;
-            enemy.canAttack = false;
-            if (health <= 0) {
-                die();
-            }
-        }
-
-        if (enemy.x < -building.width) {
-            enemyArray.splice(i, 1);
         }
     }
 
@@ -225,8 +199,52 @@ function update() {
                 fireball.x < enemy.x + enemyWidth)
             {
                 fireballArray.splice(i, 1);
-                enemyArray.splice(j, 1);
+                enemy.isDead = true;
+                enemy.canAttack = false;
+                enemy.animationTime = 0;
+                enemy.animationFrame = 0;
                 score += 50;
+            }
+        }
+    }
+
+
+    for (var i = 0; i < enemyArray.length; i++) {
+        var enemy = enemyArray[i];
+
+        if (!isPlayerDead)
+            enemy.x -= deltaTime * runSpeed;
+
+        if (playerY + playerHeight > enemy.y &&
+            playerY < enemy.y + enemyHeight &&
+            playerX + playerWidth > enemy.x &&
+            playerX < enemy.x + enemyWidth &&
+            enemy.canAttack == true) {
+            health--;
+            enemy.canAttack = false;
+            if (health <= 0) {
+                die();
+            }
+        }
+
+        if (enemy.x < -building.width) {
+            enemyArray.splice(i, 1);
+        }
+
+        enemy.animationTime += deltaTime;
+        if (enemy.isDead) {
+            if (enemy.animationTime >= 100 && enemy.animationFrame < 5) {
+                enemy.animationTime = 0;
+                enemy.animationFrame++;
+            }
+        }
+        else {
+            if (enemy.animationTime >= 150) {
+                enemy.animationTime = 0;
+                enemy.animationFrame++;
+                if (enemy.animationFrame > 3) {
+                    enemy.animationFrame = 0;
+                }
             }
         }
     }
@@ -265,7 +283,7 @@ function update() {
         die();
     }
 
-    if (!isDead) {
+    if (!isPlayerDead) {
         backgroundScroll += deltaTime * 0.025;
         if (backgroundScroll > background.width * 0.5) {
             backgroundScroll -= background.width * 0.5;
@@ -273,7 +291,7 @@ function update() {
     }
 
     playerAnimationTime += deltaTime;
-    if (isDead) {
+    if (isPlayerDead) {
         if (playerAnimationTime >= 100 && playerAnimationFrame < 5) {
             playerAnimationTime = 0;
             playerAnimationFrame++;
@@ -302,16 +320,7 @@ function update() {
         }
     }
 
-    enemyAnimationTime += deltaTime;
-    if (enemyAnimationTime >= 150) {
-        enemyAnimationTime = 0;
-        enemyAnimationFrame++;
-        if (enemyAnimationFrame > 3) {
-            enemyAnimationFrame = 0;
-        }
-    }
-
-    if (!isDead)
+    if (!isPlayerDead)
         score += deltaTime * 0.01;
 }
 
@@ -331,7 +340,12 @@ function render() {
 
     for (var i = 0; i < enemyArray.length; i++) {
         var enemy = enemyArray[i];
-        ctx.drawImage(enemySprite, enemyAnimationFrame * 18, 0, 18, 33, enemy.x, enemy.y, enemyWidth, enemyHeight);
+        if (enemy.isDead) {
+            ctx.drawImage(enemyDeath, enemy.animationFrame * 36, 0, 36, 34, enemy.x, enemy.y, enemyWidth * 2, enemyHeight);
+        }
+        else {
+            ctx.drawImage(enemyIdle, enemy.animationFrame * 18, 0, 18, 33, enemy.x, enemy.y, enemyWidth, enemyHeight);
+        }
     }
 
     for (var i = 0; i < fireballArray.length; i++) {
@@ -339,7 +353,7 @@ function render() {
         ctx.drawImage(fireballSprite, fireballAnimtionFrame * 64, 0, 64, 64, fireball.x, fireball.y, fireballSize * 4, fireballSize * 4);
     }
 
-    if (isDead) {
+    if (isPlayerDead) {
         ctx.drawImage(playerDeath, playerAnimationFrame * 23, 0, 23, 35, playerX, playerY, playerWidth, playerHeight);
     }
     else if (isPlayingAttackAnimation) {
@@ -381,7 +395,7 @@ function touchEndHandler(e) {
 }
 
 function jump() {
-    if (jumps > 0 && !isJumping && !isDead) {
+    if (jumps > 0 && !isJumping && !isPlayerDead) {
         isJumping = true;
         jumps--;
         velocity = initialJumpForce;
@@ -389,7 +403,7 @@ function jump() {
 }
 
 function attack() {
-    if (fireballCooldown <= 0 && !isDead) {
+    if (fireballCooldown <= 0 && !isPlayerDead) {
         playerAnimationTime = 0;
         playerAnimationFrame = 0;
         isPlayingAttackAnimation = true;
@@ -402,7 +416,9 @@ function attack() {
 }
 
 function die() {
-    isDead = true;
+    isPlayerDead = true;
+    animationTime = 0;
+    animationFrame = 0;
     //clearInterval(gameLoopInterval);
 }
 
