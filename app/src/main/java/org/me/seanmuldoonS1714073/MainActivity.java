@@ -33,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
         webView = (WebView)findViewById(R.id.mainWebView);
 
         webView.getSettings().setJavaScriptEnabled(true);
+        webView.getSettings().setMediaPlaybackRequiresUserGesture(false);
         webView.loadUrl("file:///android_asset/game.html");
     }
 }

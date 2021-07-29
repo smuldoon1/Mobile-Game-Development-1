@@ -9,6 +9,8 @@ var enemySprite = document.getElementById('enemy');
 var fireballSprite = document.getElementById('fireball');
 var background = document.getElementById('background');
 
+var music = document.getElementById('gameMusic');
+
 var scene = "main_menu";
 
 var previousDate;
@@ -135,6 +137,8 @@ function init() {
 
     document.addEventListener("touchstart", touchStartHandler, false);
     document.addEventListener("touchend", touchEndHandler, false);
+
+    music.play();
 
     ctx.font = "100px Arial";
 }
