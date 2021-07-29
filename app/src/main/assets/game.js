@@ -7,6 +7,7 @@ var playerDeath = document.getElementById('playerDeath');
 var playerAttack = document.getElementById('playerAttack');
 var enemyIdle = document.getElementById('enemyIdle');
 var enemyDeath = document.getElementById('enemyDeath');
+var enemyAttack = document.getElementById('enemyAttack');
 var fireballSprite = document.getElementById('fireball');
 var background = document.getElementById('background');
 
@@ -152,6 +153,7 @@ function update() {
                 x: newBuilding.x + newBuilding.width * 0.75 - enemyWidth * 0.5,
                 y: newBuilding.y - enemyHeight,
                 canAttack: true,
+                isAttacking: false,
                 isDead: false,
                 animationTime: 0,
                 animationFrame: 0
@@ -221,6 +223,9 @@ function update() {
             playerX < enemy.x + enemyWidth &&
             enemy.canAttack == true) {
             health--;
+            enemy.animationTime = 0;
+            enemy.animationFrame = 0;
+            enemy.isAttacking = true;
             enemy.canAttack = false;
             if (health <= 0) {
                 die();
@@ -236,6 +241,16 @@ function update() {
             if (enemy.animationTime >= 100 && enemy.animationFrame < 5) {
                 enemy.animationTime = 0;
                 enemy.animationFrame++;
+            }
+        }
+        else if (enemy.isAttacking) {
+            if (enemy.animationTime >= 100) {
+                enemy.animationTime = 0;
+                enemy.animationFrame++;
+                if (enemy.animationFrame > 5) {
+                    enemy.isAttacking = false;
+                    enemy.animationFrame = 0;
+                }
             }
         }
         else {
@@ -292,7 +307,7 @@ function update() {
 
     playerAnimationTime += deltaTime;
     if (isPlayerDead) {
-        if (playerAnimationTime >= 100 && playerAnimationFrame < 5) {
+        if (playerAnimationTime >= 150 && playerAnimationFrame < 5) {
             playerAnimationTime = 0;
             playerAnimationFrame++;
         }
@@ -343,6 +358,9 @@ function render() {
         if (enemy.isDead) {
             ctx.drawImage(enemyDeath, enemy.animationFrame * 36, 0, 36, 34, enemy.x, enemy.y, enemyWidth * 2, enemyHeight);
         }
+        else if (enemy.isAttacking) {
+            ctx.drawImage(enemyAttack, enemy.animationFrame * 23, 0, 23, 34, enemy.x, enemy.y, enemyWidth, enemyHeight);
+        }
         else {
             ctx.drawImage(enemyIdle, enemy.animationFrame * 18, 0, 18, 33, enemy.x, enemy.y, enemyWidth, enemyHeight);
         }
@@ -354,7 +372,7 @@ function render() {
     }
 
     if (isPlayerDead) {
-        ctx.drawImage(playerDeath, playerAnimationFrame * 23, 0, 23, 35, playerX, playerY, playerWidth, playerHeight);
+        ctx.drawImage(playerDeath, playerAnimationFrame * 23, 0, 23, 35, playerX, playerY, playerWidth * 0.7, playerHeight);
     }
     else if (isPlayingAttackAnimation) {
         ctx.drawImage(playerAttack, playerAnimationFrame * 36, 0, 36, 32, playerX, playerY, playerWidth, playerHeight);
