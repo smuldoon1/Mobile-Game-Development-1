@@ -11,6 +11,11 @@ var enemyAttack = document.getElementById('enemyAttack');
 var fireballSprite = document.getElementById('fireball');
 var background = document.getElementById('background');
 
+var jumpSFX = document.getElementById('jumpSFX');
+var doubleJumpSFX = document.getElementById('doubleJumpSFX');
+var playerDamagedSFX = document.getElementById('playerDamagedSFX');
+var playerDeathSFX = document.getElementById('playerDeathSFX');
+var playerAttackSFX = document.getElementById('playerAttackSFX');
 var music = document.getElementById('gameMusic');
 
 var scene = "main_menu";
@@ -227,6 +232,7 @@ function update() {
             enemy.animationFrame = 0;
             enemy.isAttacking = true;
             enemy.canAttack = false;
+            playerDamagedSFX.play();
             if (health <= 0) {
                 die();
             }
@@ -294,7 +300,7 @@ function update() {
         jumpHeldTime = 0;
     }
 
-    if (playerY > canvas.height) {
+    if (playerY > canvas.height && !isPlayerDead) {
         die();
     }
 
@@ -417,6 +423,12 @@ function jump() {
         isJumping = true;
         jumps--;
         velocity = initialJumpForce;
+        if (jumps == 0) {
+            doubleJumpSFX.play();
+        }
+        else {
+            jumpSFX.play();
+        }
     }
 }
 
@@ -426,6 +438,7 @@ function attack() {
         playerAnimationFrame = 0;
         isPlayingAttackAnimation = true;
         fireballCooldown = fireballCooldownTimer;
+        playerAttackSFX.play();
         fireballArray.push({
             x: playerX + playerWidth * 0.65,
             y: playerY + playerHeight * 0.2
@@ -437,6 +450,8 @@ function die() {
     isPlayerDead = true;
     animationTime = 0;
     animationFrame = 0;
+    music.pause();
+    playerDeathSFX.play();
     //clearInterval(gameLoopInterval);
 }
 
