@@ -4,6 +4,7 @@ var ctx = canvas.getContext("2d");
 var playerRunning = document.getElementById('playerRunning');
 var playerJumping = document.getElementById('playerJumping');
 var playerDeath = document.getElementById('playerDeath');
+var playerAttack = document.getElementById('playerAttack');
 var enemySprite = document.getElementById('enemy');
 var fireballSprite = document.getElementById('fireball');
 var background = document.getElementById('background');
@@ -25,6 +26,7 @@ var playerHeight;
 
 var playerAnimationTime;
 var playerAnimationFrame;
+var isPlayingAttackAnimation;
 
 var health;
 var score;
@@ -80,6 +82,7 @@ function init() {
 
     playerAnimationTime = 0;
     playerAnimationFrame = 0;
+    isPlayingAttackAnimation = false;
 
     health = 3;
     score = 0;
@@ -277,6 +280,9 @@ function update() {
             playerAnimationFrame++;
             if (playerAnimationFrame > 5) {
                 playerAnimationFrame = 0;
+                if (isPlayingAttackAnimation) {
+                    isPlayingAttackAnimation = false; 
+                }
             }
         }
     }
@@ -330,11 +336,14 @@ function render() {
     if (isDead) {
         ctx.drawImage(playerDeath, playerAnimationFrame * 23, 0, 23, 35, playerX, playerY, playerWidth, playerHeight);
     }
-    else if (isGrounded) {
-        ctx.drawImage(playerRunning, playerAnimationFrame * 32, 0, 32, 32, playerX, playerY, playerWidth, playerHeight);
+    else if (isPlayingAttackAnimation) {
+        ctx.drawImage(playerAttack, playerAnimationFrame * 36, 0, 36, 32, playerX, playerY, playerWidth, playerHeight);
+    }
+    else if (!isGrounded) {
+        ctx.drawImage(playerJumping, getJumpIndex(velocity) * 31, 0, 31, 33, playerX, playerY, playerWidth, playerHeight);
     }
     else {
-        ctx.drawImage(playerJumping, getJumpIndex(velocity) * 31, 0, 31, 33, playerX, playerY, playerWidth, playerHeight);
+        ctx.drawImage(playerRunning, playerAnimationFrame * 32, 0, 32, 32, playerX, playerY, playerWidth, playerHeight);
     }
 
     ctx.strokeText("Health: " + health, 30, 100);
@@ -366,7 +375,7 @@ function touchEndHandler(e) {
 }
 
 function jump() {
-    if (jumps > 0 && !isJumping) {
+    if (jumps > 0 && !isJumping && !isDead) {
         isJumping = true;
         jumps--;
         velocity = initialJumpForce;
@@ -374,7 +383,10 @@ function jump() {
 }
 
 function attack() {
-    if (fireballCooldown <= 0) {
+    if (fireballCooldown <= 0 && !isDead) {
+        playerAnimationTime = 0;
+        playerAnimationFrame = 0;
+        isPlayingAttackAnimation = true;
         fireballCooldown = fireballCooldownTimer;
         fireballArray.push({
             x: playerX + playerWidth * 1.05,
