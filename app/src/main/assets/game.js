@@ -151,7 +151,8 @@ function update() {
         if (newBuilding.width > canvas.width * 0.4 && Math.random() > 0.6) {
             enemyArray.push({
                 x: newBuilding.x + newBuilding.width * 0.75 - enemyWidth * 0.5,
-                y: newBuilding.y - enemyHeight
+                y: newBuilding.y - enemyHeight,
+                canAttack: true
             });
         }
         timeSinceLastBuilding = (Math.random() * buildingGap) - newBuilding.width;
@@ -189,10 +190,11 @@ function update() {
         if (playerY + playerHeight > enemy.y &&
             playerY < enemy.y + enemyHeight &&
             playerX + playerWidth > enemy.x &&
-            playerX < enemy.x + enemyWidth)
+            playerX < enemy.x + enemyWidth &&
+            enemy.canAttack == true)
         {
             health--;
-            enemyArray.splice(i, 1);
+            enemy.canAttack = false;
             if (health <= 0) {
                 die();
             }
@@ -389,7 +391,7 @@ function attack() {
         isPlayingAttackAnimation = true;
         fireballCooldown = fireballCooldownTimer;
         fireballArray.push({
-            x: playerX + playerWidth * 1.05,
+            x: playerX + playerWidth * 0.65,
             y: playerY + playerHeight * 0.2
         });
     }
