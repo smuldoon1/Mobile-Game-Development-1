@@ -17,3 +17,8 @@ canvas {
  padding: 0;
  margin: 0;
 }
+@font-face {
+    font-family: "Score_Font";
+    src: url("file:///android_asset/8-bit-pusab.woff") format("woff");
+    font-weight: bold;
+}

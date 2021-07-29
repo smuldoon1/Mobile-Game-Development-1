@@ -9,6 +9,10 @@ var enemyIdle = document.getElementById('enemyIdle');
 var enemyDeath = document.getElementById('enemyDeath');
 var enemyAttack = document.getElementById('enemyAttack');
 var fireballSprite = document.getElementById('fireball');
+var healthbarEmpty = document.getElementById('healthbarEmpty');
+var healthbarNearDeath = document.getElementById('healthbarNearDeath');
+var healthbarDamaged = document.getElementById('healthbarDamaged');
+var healthbarFull = document.getElementById('healthbarFull');
 var background = document.getElementById('background');
 
 var jumpSFX = document.getElementById('jumpSFX');
@@ -16,6 +20,7 @@ var doubleJumpSFX = document.getElementById('doubleJumpSFX');
 var playerDamagedSFX = document.getElementById('playerDamagedSFX');
 var playerDeathSFX = document.getElementById('playerDeathSFX');
 var playerAttackSFX = document.getElementById('playerAttackSFX');
+var enemyDeathSFX = document.getElementById('enemyDeathSFX');
 var music = document.getElementById('gameMusic');
 
 var scene = "main_menu";
@@ -142,8 +147,6 @@ function init() {
     document.addEventListener("touchend", touchEndHandler, false);
 
     music.play();
-
-    ctx.font = "100px Arial";
 }
 
 function update() {
@@ -212,6 +215,7 @@ function update() {
                 enemy.canAttack = false;
                 enemy.animationTime = 0;
                 enemy.animationFrame = 0;
+                enemyDeathSFX.play();
                 score += 50;
             }
         }
@@ -303,6 +307,7 @@ function update() {
 
     if (playerY > canvas.height && !isPlayerDead) {
         die();
+        health = 0;
     }
 
     if (!isPlayerDead) {
@@ -395,9 +400,14 @@ function render() {
         ctx.drawImage(playerRunning, playerAnimationFrame * 32, 0, 32, 32, playerX, playerY, playerWidth, playerHeight);
     }
 
-    ctx.strokeText("Health: " + health, 30, 100);
-    ctx.strokeText("Score: " + Math.round(score), 30, 210);
-    ctx.strokeText("x: " + speedMultiplier, 30, 320);
+    var healthbar = getHealthbarImage();
+    ctx.drawImage(healthbar, canvas.width - canvas.width * 0.45 - 20, 20, canvas.width * 0.45, canvas.width * 0.12);
+
+    var fontSize = getFontSize(40);
+    ctx.font = fontSize + 'px Score_Font';
+    ctx.fillStyle = '#fff133';
+    ctx.fillText("score: " + Math.round(score), canvas.width * 0.05, fontSize * 2.5);
+    //ctx.strokeText("x: " + speedMultiplier, 30, 320);
 }
 
 function touchStartHandler(e) {
@@ -474,6 +484,23 @@ function getJumpIndex(velocity) {
     else {
         return 3;
     }
+}
+
+function getHealthbarImage() {
+    switch (health) {
+        case 0:
+            return healthbarEmpty;
+        case 1:
+            return healthbarNearDeath;
+        case 2:
+            return healthbarDamaged;
+        default:
+            return healthbarFull;
+    }
+}
+
+function getFontSize(relativeSize) {
+    return canvas.width * 0.001 * relativeSize;
 }
 
 function gameLoop() {

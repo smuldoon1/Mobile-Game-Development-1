@@ -1,8 +1,11 @@
 Player + enemy sprites - https://craftpix.net/freebies/free-3-cyberpunk-characters-pixel-art/
 Fireball sprite - https://www.pngwing.com/en/free-png-nvgnm
 City background - https://wallpaperaccess.com/city-pixel-art
+Healthbar sprite - https://www.nicepng.com/ourpic/u2q8y3i1t4q8t4y3_health-bar-original-one-hit-health-bar-pixel/
 Background music - https://freesound.org/people/VABsounds/sounds/443865/
 Jump sound - https://freesound.org/people/qubodup/sounds/60013/
 Enemy attack/player damaged sound - https://freesound.org/people/Cigaro30/sounds/420932/
 Player death - https://freesound.org/people/myfox14/sounds/382310/
 Player attack sound - https://freesound.org/people/notyermom/sounds/434834/
+Enemy death sound - https://freesound.org/people/Paul368/sounds/264062/
+Score font - https://www.dafont.com/8-bit-pusab.font

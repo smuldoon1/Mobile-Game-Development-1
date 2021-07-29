@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
         webView = (WebView)findViewById(R.id.mainWebView);
 
         webView.getSettings().setJavaScriptEnabled(true);
-        webView.getSettings().setMediaPlaybackRequiresUserGesture(false);
+        webView.getSettings().setMediaPlaybackRequiresUserGesture(false); // Allows music and sound effects to be played without requiring explicit user input
         webView.loadUrl("file:///android_asset/game.html");
     }
 }
