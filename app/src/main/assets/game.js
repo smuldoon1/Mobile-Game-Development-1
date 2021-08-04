@@ -23,8 +23,6 @@ var playerAttackSFX = document.getElementById('playerAttackSFX');
 var enemyDeathSFX = document.getElementById('enemyDeathSFX');
 var music = document.getElementById('gameMusic');
 
-var scene = "main_menu";
-
 var previousDate;
 var deltaTime;
 
@@ -84,8 +82,6 @@ var enemyHeight;
 function init() {
     previousDate = performance.now();
 
-    ctx.imageSmoothingEnabled = false; // Ensures sprites are not drawn blurry
-
     backgroundScroll = 0;
     backgroundWidth = canvas.width / (canvas.height / background.height);
 
@@ -105,15 +101,15 @@ function init() {
     isJumping = false;
     isGrounded = true;
     jumpHeldTime = 0;
-    maxJumpHoldTime = 300;
+    maxJumpHoldTime = 400;
     jumps = 2;
     runSpeed = 720 / canvas.width;
     speedMultiplier = 0.9;
 
     gravity = 8.88 / canvas.height;
     initialVelocity = 296 / canvas.height;
-    initialJumpForce = -3500 / canvas.height;
-    jumpFoldForce = 70 / canvas.height;
+    initialJumpForce = -3350 / canvas.height;
+    jumpFoldForce = 100 / canvas.height;
 
     velocity = initialVelocity;
 
@@ -473,7 +469,6 @@ function die() {
     animationFrame = 0;
     music.pause();
     playerDeathSFX.play();
-    //clearInterval(gameLoopInterval);
 }
 
 function getJumpIndex(velocity) {
@@ -508,6 +503,14 @@ function getFontSize(relativeSize) {
     return canvas.width * 0.001 * relativeSize;
 }
 
+function showMainMenu() {
+
+}
+
+function showGameOver() {
+
+}
+
 function gameLoop() {
     var dateNow = performance.now();
     deltaTime = dateNow - previousDate;
@@ -517,8 +520,24 @@ function gameLoop() {
     render();
 }
 
-// Sets up game variables
-init();
+function setScene(sceneName) {
+    switch (sceneName) {
+        case "main_menu":
+            clearInterval(gameLoopInterval);
+            showMainMenu();
+            break;
+        case "game_level":
+            init(); // Sets up game variables
+            setInterval(gameLoop, 10); // Starts the game loop so the update and render functions are called every 10 milliseconds
+            break;
+        case "game_over":
+            showGameOver();
+            break;
+        default:
+            break;
+    }
+}
 
-// Starts the game loop so the update and render functions are called every 10 milliseconds
-var gameLoopInterval = setInterval(gameLoop, 10);
+ctx.imageSmoothingEnabled = false; // Ensures sprites are not drawn blurry
+
+setScene("game_level"); // Start the game in the main menu scene
