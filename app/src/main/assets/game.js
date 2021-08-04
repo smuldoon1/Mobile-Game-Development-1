@@ -32,6 +32,7 @@ var rightPressed;
 var leftPressed;
 
 var backgroundScroll;
+var backgroundWidth;
 
 var playerX;
 var playerY;
@@ -67,7 +68,7 @@ var fireballSize;
 var fireballSpeed;
 
 var fireballAnimationTime;
-var fireballAnimtionFrame;
+var fireballAnimationFrame;
 
 var buildingsArray;
 var timeSinceLastBuilding;
@@ -86,6 +87,7 @@ function init() {
     ctx.imageSmoothingEnabled = false; // Ensures sprites are not drawn blurry
 
     backgroundScroll = 0;
+    backgroundWidth = canvas.width / (canvas.height / background.height);
 
     playerWidth = canvas.width * 0.2;
     playerHeight = playerWidth;
@@ -122,12 +124,12 @@ function init() {
     fireballSpeed = 1728 / canvas.width;
 
     fireballAnimationTime = 0;
-    fireballAnimtionFrame = 0;
+    fireballAnimationFrame = 0;
 
     buildingsArray = [];
-    timeSinceLastBuilding = 1000;//200000 / canvas.width;
-    maxTimeSinceLastBuilding = 1500;// 2200000 / canvas.width;
-    buildingGap = 900;//1200000 / canvas.width;
+    timeSinceLastBuilding = 1080000 / canvas.width;
+    maxTimeSinceLastBuilding = 1620000 / canvas.width;
+    buildingGap = 972000 / canvas.width;
 
     buildingsArray.push({
         x: canvas.width * 0,
@@ -341,9 +343,9 @@ function update() {
     fireballAnimationTime += deltaTime;
     if (fireballAnimationTime >= 80) {
         fireballAnimationTime = 0;
-        fireballAnimtionFrame++;
-        if (fireballAnimtionFrame > 3) {
-            fireballAnimtionFrame = 0;
+        fireballAnimationFrame++;
+        if (fireballAnimationFrame > 3) {
+            fireballAnimationFrame = 0;
         }
     }
 
@@ -358,7 +360,7 @@ function update() {
 function render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    ctx.drawImage(background, backgroundScroll, 0, 400, 729, 0, 0, canvas.width, canvas.height);
+    ctx.drawImage(background, backgroundScroll, 0, backgroundWidth, background.height, 0, 0, canvas.width, canvas.height);
 
     for (var i = 0; i < buildingsArray.length; i++) {
         var building = buildingsArray[i];
@@ -384,7 +386,7 @@ function render() {
 
     for (var i = 0; i < fireballArray.length; i++) {
         var fireball = fireballArray[i];
-        ctx.drawImage(fireballSprite, fireballAnimtionFrame * 64, 0, 64, 64, fireball.x, fireball.y, fireballSize * 4, fireballSize * 4);
+        ctx.drawImage(fireballSprite, fireballAnimationFrame * 64, 0, 64, 64, fireball.x, fireball.y, fireballSize * 4, fireballSize * 4);
     }
 
     if (isPlayerDead) {
@@ -407,7 +409,6 @@ function render() {
     ctx.font = fontSize + 'px Score_Font';
     ctx.fillStyle = '#fff133';
     ctx.fillText("score: " + Math.round(score), canvas.width * 0.05, fontSize * 2.5);
-    //ctx.strokeText("x: " + speedMultiplier, 30, 320);
 }
 
 function touchStartHandler(e) {
@@ -432,6 +433,10 @@ function touchEndHandler(e) {
         leftPressed = false;
         rightPressed = false;
     }
+}
+
+function getRandomBuilding() {
+
 }
 
 function jump() {
