@@ -79,6 +79,8 @@ var enemyArray;
 var enemyWidth;
 var enemyHeight;
 
+var entities = [];
+
 function init() {
     previousDate = performance.now();
 
@@ -535,6 +537,134 @@ function setScene(sceneName) {
             break;
         default:
             break;
+    }
+}
+
+class Entity {
+    constructor(moveSpeed, rect, sprite) {
+        this.moveSpeed = moveSpeed;
+        this.rect = rect;
+        this.sprite = sprite;
+    }
+
+    draw() {
+        let spr = this.sprite.sprite;
+        ctx.drawImage(spr, this.sprite.animationFrame * spr.width, 0, spr.width, spr.health, this.x, this.y, this.width, this.height);
+    }
+
+    update() {
+        let spr = this.sprite.sprite;
+        spr.animationTime += deltaTime;
+        if (spr.loop) {
+            if (spr.animationTime >= animationSpeed) {
+                spr.animationTime = 0;
+                spr.animationFrame++;
+                if (spr.animationFrame > spr.frameCount) {
+                    spr.animationFrame = 0;
+                }
+            }
+        }
+        else {
+            if (spr.animationTime >= spr.animationSpeed && spr.animationFrame < spr.frameCount + 1) {
+                spr.animationTime = 0;
+                spr.animationFrame++;
+            }
+            else {
+                onAnimationEnd();
+            }
+        }
+    }
+
+    onAnimationEnd() {
+
+    }
+}
+
+class Player extends Entity {
+    constructor(moveSpeed, rect, runSprite, jumpSprite, attackSprite, deathSprite) {
+        super(moveSpeed, rect, runSprite);
+        this.runSprite = runSprite;
+        this.jumpSprite = jumpSprite;
+        this.attackSprite = attackSprite;
+        this.deathSprite = deathSprite;
+    }
+
+    changeState(state) {
+        switch (state) {
+            case "run":
+                this.sprite = this.runSprite;
+                break;
+            case "jump":
+                this.sprite = this.jumpSprite;
+                break;
+            case "attack":
+                this.sprite = this.attackSprite;
+                break;
+            case "death":
+                this.sprite = this.deathSprite;
+                break;
+        }
+    }
+
+    onAnimationEnd() {
+        if (this.sprite == this.attackSprite) {
+            this.changeState("run");
+        }
+    }
+}
+
+class Enemy extends Entity {
+    constructor(moveSpeed, rect, idleSprite, attackSprite, deathSprite) {
+        super(moveSpeed, rect, idleSprite);
+        this.idleSprite = idleSprite;
+        this.attackSprite = attackSprite;
+        this.deathSprite = deathSprite;
+    }
+
+    changeState(state) {
+        switch (state) {
+            case "idle":
+                this.sprite = this.idleSprite;
+                break;
+            case "attack":
+                this.sprite = this.attackSprite;
+                break;
+            case "death":
+                this.sprite = this.deathSprite;
+                break;
+        }
+    }
+}
+
+class Fireball extends Entity {
+    constructor(moveSpeed, rect, sprite) {
+        super(moveSpeed, rect, sprite);
+    }
+}
+
+class Building extends Entity {
+    constructor(moveSpeed, rect, sprite) {
+        super(moveSpeed, rect, sprite);
+    }
+}
+
+class Rect {
+    constructor(x, y, width, height) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+    }
+}
+
+class Sprite {
+    constructor(sprite, animationSpeed, frameCount, loop) {
+        this.sprite = sprite;
+        this.animationSpeed = animationSpeed;
+        this.frameCount = frameCount;
+        this.loop = loop;
+        this.animationTime = 0;
+        this.animationFrame = 0;
     }
 }
 
