@@ -67,11 +67,8 @@ var buildingGap;
 var buildingWidth;
 var buildingHeight;
 
-var enemyArray;
-var enemyWidth;
-var enemyHeight;
-
 var player;
+var enemies = [];
 var entities = [];
 
 function init() {
@@ -83,7 +80,7 @@ function init() {
     isPlayingAttackAnimation = false;
 
     player = new Player(
-        720 / canvas.width,
+        0,
         new Rect(canvas.width * 0.1, canvas.height * 0.5 - canvas.width * 0.2, canvas.width * 0.2, canvas.width * 0.2),
         3,
         new Sprite(playerRunning, 32, 32, 100, 6, true),
@@ -93,10 +90,7 @@ function init() {
     );
 
     score = 0;
-    isPlayerDead = false;
 
-    isJumping = false;
-    isGrounded = true;
     jumpHeldTime = 0;
     maxJumpHoldTime = 400;
     jumps = 2;
@@ -131,10 +125,6 @@ function init() {
         height: canvas.height
     });
 
-    enemyArray = [];
-    enemyWidth = canvas.width * 0.15;
-    enemyHeight = enemyWidth * 1.8333;
-
     rightPressed = false;
     leftPressed = false;
 
@@ -154,15 +144,13 @@ function update() {
         };
         buildingsArray.push(newBuilding);
         if (newBuilding.width > canvas.width * 0.4 && Math.random() > 0.6) {
-            enemyArray.push({
-                x: newBuilding.x + newBuilding.width * 0.75 - enemyWidth * 0.5,
-                y: newBuilding.y - enemyHeight,
-                canAttack: true,
-                isAttacking: false,
-                isDead: false,
-                animationTime: 0,
-                animationFrame: 0
-            });
+            enemies.push(new Enemy(
+                720 / canvas.width,
+                new Rect(newBuilding.x + newBuilding.width * 0.75 - canvas.width * 0.075, newBuilding.y - canvas.width * 0.275, canvas.width * 0.15, canvas.width * 0.275),
+                new Sprite(enemyIdle, 18, 33, 150, 4, true),
+                new Sprite(enemyAttack, 23, 34, 100, 6, false),
+                new Sprite(enemyDeath, 36, 34, 100, 6, false)
+            ));
         }
         timeSinceLastBuilding = (Math.random() * buildingGap) - newBuilding.width;
     }
@@ -191,23 +179,24 @@ function update() {
     }
 
     for (var i = 0; i < fireballArray.length; i++) {
-        var fireball = fireballArray[i];
+        let fireball = fireballArray[i];
         fireball.x += deltaTime * fireballSpeed;
 
         if (fireball.x > canvas.width) {
             fireballArray.splice(i, 1);
         }
 
-        for (var j = 0; j < enemyArray.length; j++) {
-            var enemy = enemyArray[j];
-            if (fireball.y + fireballSize > enemy.y &&
-                fireball.y < enemy.y + enemyHeight &&
-                fireball.x + fireballSize * 2 > enemy.x &&
-                fireball.x < enemy.x + enemyWidth)
+        for (var j = 0; j < enemies.length; j++) {
+            let enemy = enemies[j];
+            if (fireball.y + fireballSize > enemy.rect.y &&
+                fireball.y < enemy.rect.y + enemy.rect.height &&
+                fireball.x + fireballSize * 2 > enemy.rect.x &&
+                fireball.x < enemy.rect.x + enemy.rect.width)
             {
                 fireballArray.splice(i, 1);
-                enemy.isDead = true;
+                enemy.isAlive = false;
                 enemy.canAttack = false;
+                enemy.changeState("dead");
                 enemy.animationTime = 0;
                 enemy.animationFrame = 0;
                 enemyDeathSFX.play();
@@ -216,20 +205,19 @@ function update() {
         }
     }
 
-    for (var i = 0; i < enemyArray.length; i++) {
-        var enemy = enemyArray[i];
+    for (var i = 0; i < enemies.length; i++) {
+        let enemy = enemies[i];
 
         if (!isPlayerDead)
-            enemy.x -= deltaTime * runSpeed * speedMultiplier;
+            enemy.rect.x -= deltaTime * runSpeed * speedMultiplier;
 
-        if (player.rect.y + player.rect.height > enemy.y &&
-            player.rect.y < enemy.y + enemyHeight &&
-            player.rect.x + player.rect.width > enemy.x &&
-            player.rect.x < enemy.x + player.rect.width &&
+        if (player.rect.y + player.rect.height > enemy.rect.y &&
+            player.rect.y < enemy.rect.y + enemy.rect.height &&
+            player.rect.x + player.rect.width > enemy.rect.x &&
+            player.rect.x < enemy.rect.x + player.rect.width &&
             enemy.canAttack == true) {
             player.health--;
-            enemy.animationTime = 0;
-            enemy.animationFrame = 0;
+            enemy.changeState("attack");
             enemy.isAttacking = true;
             enemy.canAttack = false;
             playerDamagedSFX.play();
@@ -238,35 +226,8 @@ function update() {
             }
         }
 
-        if (enemy.x < -building.width) {
-            enemyArray.splice(i, 1);
-        }
-
-        enemy.animationTime += deltaTime;
-        if (enemy.isDead) {
-            if (enemy.animationTime >= 100 && enemy.animationFrame < 5) {
-                enemy.animationTime = 0;
-                enemy.animationFrame++;
-            }
-        }
-        else if (enemy.isAttacking) {
-            if (enemy.animationTime >= 100) {
-                enemy.animationTime = 0;
-                enemy.animationFrame++;
-                if (enemy.animationFrame > 5) {
-                    enemy.isAttacking = false;
-                    enemy.animationFrame = 0;
-                }
-            }
-        }
-        else {
-            if (enemy.animationTime >= 150) {
-                enemy.animationTime = 0;
-                enemy.animationFrame++;
-                if (enemy.animationFrame > 3) {
-                    enemy.animationFrame = 0;
-                }
-            }
+        if (enemy.rect.x < -building.width) {
+            enemies.splice(i, 1);
         }
     }
 
@@ -346,19 +307,6 @@ function render() {
         ctx.fillStyle = "#693996";
         ctx.fill();
         ctx.closePath();
-    }
-
-    for (var i = 0; i < enemyArray.length; i++) {
-        var enemy = enemyArray[i];
-        if (enemy.isDead) {
-            ctx.drawImage(enemyDeath, enemy.animationFrame * 36, 0, 36, 34, enemy.x, enemy.y, enemyWidth * 2, enemyHeight);
-        }
-        else if (enemy.isAttacking) {
-            ctx.drawImage(enemyAttack, enemy.animationFrame * 23, 0, 23, 34, enemy.x, enemy.y, enemyWidth, enemyHeight);
-        }
-        else {
-            ctx.drawImage(enemyIdle, enemy.animationFrame * 18, 0, 18, 33, enemy.x, enemy.y, enemyWidth, enemyHeight);
-        }
     }
 
     for (var i = 0; i < fireballArray.length; i++) {
@@ -598,6 +546,9 @@ class Enemy extends Entity {
         this.idleSprite = idleSprite;
         this.attackSprite = attackSprite;
         this.deathSprite = deathSprite;
+        this.isAlive = true;
+        this.canAttack = true;
+        this.isAttacking = false;
     }
 
     changeState(state) {
