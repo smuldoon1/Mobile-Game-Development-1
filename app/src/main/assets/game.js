@@ -32,34 +32,20 @@ var leftPressed;
 var backgroundScroll;
 var backgroundWidth;
 
-var isPlayingAttackAnimation;
-
 var score;
-var isPlayerDead;
 
-var isJumping;
-var isGrounded;
 var jumpHeldTime;
 var maxJumpHoldTime;
-var jumps;
-var runSpeed;
 var speedMultiplier;
-
-var velocity;
 
 var gravity;
 var initialVelocity;
 var initialJumpForce;
 var jumpFoldForce;
 
-var buildingsArray;
 var timeSinceLastBuilding;
 var maxTimeSinceLastBuilding;
 var buildingGap;
-var buildingWidth;
-var buildingHeight;
-
-var timeSinceLastFrame = 0;
 
 var player;
 var enemies = [];
@@ -74,24 +60,10 @@ function init() {
     backgroundScroll = 0;
     backgroundWidth = canvas.width / (canvas.height / background.height);
 
-    isPlayingAttackAnimation = false;
-
-    player = new Player(
-        0,
-        new Rect(canvas.width * 0.1, canvas.height * 0.5 - canvas.width * 0.2, canvas.width * 0.2, canvas.width * 0.2),
-        3,
-        new Sprite(playerRunning, 32, 32, 100, 6, true),
-        new Sprite(playerJumping, 31, 33, 100, 4, true),
-        new Sprite(playerAttack, 36, 32, 100, 6, false),
-        new Sprite(playerDeath, 23, 35, 150, 6, false)
-    );
-
     score = 0;
 
     jumpHeldTime = 0;
     maxJumpHoldTime = 400;
-    jumps = 2;
-    runSpeed = 720 / canvas.width;
     speedMultiplier = 0.9;
 
     gravity = 8.88 / canvas.height;
@@ -99,14 +71,21 @@ function init() {
     initialJumpForce = -3350 / canvas.height;
     jumpFoldForce = 100 / canvas.height;
 
-    velocity = initialVelocity;
-
     fireballSpeed = 1728 / canvas.width;
 
     buildingsArray = [];
     timeSinceLastBuilding = 1080000 / canvas.width;
     maxTimeSinceLastBuilding = 1620000 / canvas.width;
     buildingGap = 972000 / canvas.width;
+
+    player = new Player(
+        0,
+        new Rect(canvas.width * 0.1, canvas.height * 0.5 - canvas.width * 0.2, canvas.width * 0.2, canvas.width * 0.2),
+        new Sprite(playerRunning, 32, 32, 100, 6, true),
+        new Sprite(playerJumping, 31, 33, 100, 4, true),
+        new Sprite(playerAttack, 36, 32, 100, 6, false),
+        new Sprite(playerDeath, 23, 35, 150, 6, false)
+    );
 
     buildings.push(new Building(
         -720 / canvas.width,
@@ -149,7 +128,7 @@ function update() {
     }
     timeSinceLastBuilding += deltaTime * speedMultiplier;
 
-    isGrounded = false;
+    player.isGrounded = false;
     for (var i = 0; i < buildings.length; i++) {
         var building = buildings[i];
 
@@ -157,10 +136,10 @@ function update() {
             player.rect.y + player.rect.height > building.rect.y - 10 &&
             player.rect.x + player.rect.width >= building.rect.x &&
             player.rect.x <= building.rect.x + building.rect.width &&
-            velocity > 0)
+            player.velocity > 0)
         {
             player.rect.y = building.rect.y - player.rect.height;
-            isGrounded = true;
+            player.isGrounded = true;
         }
 
         if (building.rect.x < -building.rect.width) {
@@ -191,26 +170,26 @@ function update() {
         }
     }
 
-    if (isGrounded) {
-        jumps = 2;
-        velocity = initialVelocity;
+    if (player.isGrounded) {
+        player.jumps = 2;
+        player.velocity = initialVelocity;
     }
     else {
-        if (jumps == 2) {
-            jumps = 1;
+        if (player.jumps == 2) {
+            player.jumps = 1;
         }
-        velocity += deltaTime * gravity;
-        player.rect.y += velocity * deltaTime;
+        player.velocity += deltaTime * gravity;
+        player.rect.y += player.velocity * deltaTime;
     }
 
     if (leftPressed) {
-        if (isJumping && jumpHeldTime < maxJumpHoldTime) {
-            velocity -= jumpFoldForce * (jumpHeldTime / maxJumpHoldTime);
+        if (player.isJumping && jumpHeldTime < maxJumpHoldTime) {
+            player.velocity -= jumpFoldForce * (jumpHeldTime / maxJumpHoldTime);
             jumpHeldTime += deltaTime;
         }
     }
     else {
-        isJumping = false;
+        player.isJumping = false;
         jumpHeldTime = 0;
     }
 
@@ -219,19 +198,21 @@ function update() {
         player.health = 0;
     }
 
-    if (!isPlayerDead) {
+    if (player.isAlive) {
         backgroundScroll += deltaTime * 0.025 * speedMultiplier;
         if (backgroundScroll > background.width * 0.5) {
             backgroundScroll -= background.width * 0.5;
         }
     }
 
-    if (!isPlayerDead) {
+    if (player.isAlive) {
         score += deltaTime * 0.01 * speedMultiplier;
         speedMultiplier += deltaTime * 0.0000025;
         if (speedMultiplier > 1.5)
             speedMultiplier = 1.5;
     }
+
+    console.log(player.rect.x + ", " + player.rect.y)
 }
 
 // Handles rendering of sprites and UI elements
@@ -278,12 +259,12 @@ function touchStartHandler(e) {
         if (touches[i].pageX < canvas.width * 0.18) {
             leftPressed = true;
             rightPressed = false;
-            jump();
+            player.jump();
         }
         if (touches[i].pageX >= canvas.width * 0.18) {
             rightPressed = true;
             leftPressed = false;
-            attack();
+            player.attack();
         }
     }
 }
@@ -297,34 +278,6 @@ function touchEndHandler(e) {
 
 function getRandomBuilding() {
 
-}
-
-function jump() {
-    if (jumps > 0 && !isJumping && !isPlayerDead) {
-        isJumping = true;
-        jumps--;
-        velocity = initialJumpForce;
-        if (jumps == 0) {
-            doubleJumpSFX.play();
-        }
-        else {
-            jumpSFX.play();
-        }
-    }
-}
-
-function attack() {
-    if (player.attackCooldownTimer <= 0 && !isPlayerDead) {
-        isPlayingAttackAnimation = true;
-        player.setSprite("attack");
-        player.attackCooldownTimer = player.attackCooldown;
-        playerAttackSFX.play();
-        fireballs.push(new Fireball(
-            1728 / canvas.width,
-            new Rect(player.rect.x + player.rect.width * 0.65, player.rect.y + player.rect.height * 0.2, canvas.width * 0.16, canvas.width * 0.16),
-            new Sprite(fireballSprite, 64, 64, 80, 6, true)
-        ));
-    }
 }
 
 function getJumpIndex(velocity) {
@@ -471,25 +424,30 @@ class Entity {
 
 // Player class handles player movement and health
 class Player extends Entity {
-    constructor(moveSpeed, rect, health, runSprite, jumpSprite, attackSprite, deathSprite) {
+    constructor(moveSpeed, rect, runSprite, jumpSprite, attackSprite, deathSprite) {
         super(moveSpeed, rect, runSprite);
-        this.health = health;
         this.runSprite = runSprite;
         this.jumpSprite = jumpSprite;
         this.attackSprite = attackSprite;
         this.deathSprite = deathSprite;
-        this.attackCooldown = 700;
-        this.attackCooldownTimer = 0;
+        this.health = 3;
+        this.jumps = 2;
+        this.velocity = initialVelocity;
+        this.attackCooldown = 700; // The minimum time allowed between attacks
+        this.attackCooldownTimer = 0; // Used to track time between player attacks
+        this.isGrounded = true;
+        this.isJumping = false;
     }
 
+    // Returns true if the player has more that 0 health
     get isAlive() {
         return this.health > 0;
     }
 
     animationTick() {
         super.animationTick();
-        if (!isGrounded) {
-            this.sprite.animationFrame = getJumpIndex(velocity);
+        if (!this.isGrounded) {
+            this.sprite.animationFrame = getJumpIndex(this.velocity);
         }
     }
 
@@ -530,11 +488,43 @@ class Player extends Entity {
         }
     }
 
+    // Called when the player is out of health or has fallen off the screen
     die() {
         this.health = 0;
         player.setSprite("dead");
         music.pause();
         playerDeathSFX.play();
+    }
+
+    // Called when the player taps the left-hand side of the screen
+    jump() {
+        if (this.jumps > 0 && !this.isJumping && this.isAlive) {
+            player.setSprite("jump");
+            this.isJumping = true;
+            this.jumps--;
+            this.velocity = initialJumpForce;
+            if (this.jumps == 0) {
+                doubleJumpSFX.play();
+            }
+            else {
+                jumpSFX.play();
+            }
+        }
+    }
+
+    // Called when the player taps the right-hand side of the screen
+    attack() {
+        if (this.attackCooldownTimer <= 0 && this.isAlive) {
+            this.isPlayingAttackAnimation = true;
+            this.setSprite("attack");
+            this.attackCooldownTimer = player.attackCooldown;
+            playerAttackSFX.play();
+            fireballs.push(new Fireball(
+                1728 / canvas.width,
+                new Rect(this.rect.x + this.rect.width * 0.65, this.rect.y + this.rect.height * 0.2, canvas.width * 0.16, canvas.width * 0.16),
+                new Sprite(fireballSprite, 64, 64, 80, 6, true)
+            ));
+        }
     }
 
     onAnimationEnd() {
