@@ -62,6 +62,7 @@ var buildingHeight;
 var player;
 var enemies = [];
 var fireballs = [];
+var buildings = [];
 
 var entities = [];
 
@@ -105,12 +106,11 @@ function init() {
     maxTimeSinceLastBuilding = 1620000 / canvas.width;
     buildingGap = 972000 / canvas.width;
 
-    buildingsArray.push({
-        x: canvas.width * 0,
-        y: canvas.height * 0.5,
-        width: canvas.width * 1.5,
-        height: canvas.height
-    });
+    buildings.push(new Building(
+        -720 / canvas.width,
+        new Rect(0, canvas.height * 0.5, canvas.width * 1.5, canvas.height),
+        null
+    ));
 
     rightPressed = false;
     leftPressed = false;
@@ -128,45 +128,41 @@ function update() {
     }
 
     if (timeSinceLastBuilding > maxTimeSinceLastBuilding) {
-        var newBuilding = {
-            x: canvas.width * 1.5,
-            y: (Math.random() * canvas.height * 0.4 + (canvas.height * 0.25)),
-            width: Math.random() * canvas.width * 0.6 + canvas.width * 0.25,
-            height: canvas.height
-        };
-        buildingsArray.push(newBuilding);
-        if (newBuilding.width > canvas.width * 0.4 && Math.random() > 0.6) {
+        let newBuilding = new Building(
+            -720 / canvas.width,
+            new Rect(canvas.width * 1.5, Math.random() * canvas.height * 0.4 + (canvas.height * 0.25), Math.random() * canvas.width * 0.6 + canvas.width * 0.25, canvas.height),
+            null
+        );
+        buildings.push(newBuilding);
+        if (newBuilding.rect.width > canvas.width * 0.4 && Math.random() > 0.6) {
             enemies.push(new Enemy(
                 -720 / canvas.width,
-                new Rect(newBuilding.x + newBuilding.width * 0.75 - canvas.width * 0.075, newBuilding.y - canvas.width * 0.275, canvas.width * 0.15, canvas.width * 0.275),
+                new Rect(newBuilding.rect.x + newBuilding.rect.width * 0.75 - canvas.width * 0.075, newBuilding.rect.y - canvas.width * 0.275, canvas.width * 0.15, canvas.width * 0.275),
                 new Sprite(enemyIdle, 18, 33, 150, 4, true),
                 new Sprite(enemyAttack, 23, 34, 100, 6, false),
                 new Sprite(enemyDeath, 36, 34, 100, 6, false)
             ));
         }
-        timeSinceLastBuilding = (Math.random() * buildingGap) - newBuilding.width;
+        timeSinceLastBuilding = (Math.random() * buildingGap) - newBuilding.rect.width;
     }
     timeSinceLastBuilding += deltaTime * speedMultiplier;
 
     isGrounded = false;
-    for (var i = 0; i < buildingsArray.length; i++) {
-        var building = buildingsArray[i];
+    for (var i = 0; i < buildings.length; i++) {
+        var building = buildings[i];
 
-        if (!isPlayerDead)
-            building.x -= deltaTime * runSpeed * speedMultiplier;
-
-        if (player.rect.y + player.rect.height < building.y + 30 &&
-            player.rect.y + player.rect.height > building.y - 10 &&
-            player.rect.x + player.rect.width >= building.x &&
-            player.rect.x <= building.x + building.width &&
+        if (player.rect.y + player.rect.height < building.rect.y + 30 &&
+            player.rect.y + player.rect.height > building.rect.y - 10 &&
+            player.rect.x + player.rect.width >= building.rect.x &&
+            player.rect.x <= building.rect.x + building.rect.width &&
             velocity > 0)
         {
-            player.rect.y = building.y - player.rect.height;
+            player.rect.y = building.rect.y - player.rect.height;
             isGrounded = true;
         }
 
-        if (building.x < -building.width) {
-            buildingsArray.splice(i, 1);
+        if (building.rect.x < -building.rect.width) {
+            buildings.splice(i, 1);
         }
     }
 
@@ -181,7 +177,7 @@ function update() {
     for (var i = 0; i < enemies.length; i++) {
         let enemy = enemies[i];
 
-        if (enemy.rect.x < -building.width) {
+        if (enemy.rect.x < -building.rect.width) {
             enemies.splice(i, 1);
         }
     }
@@ -236,27 +232,34 @@ function update() {
     }
 }
 
+// Handles rendering of sprites and UI elements
 function render() {
+
+    // Clear the canvas at the beginning of each frame
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    // Draw the background image
     ctx.drawImage(background, backgroundScroll, 0, backgroundWidth, background.height, 0, 0, canvas.width, canvas.height);
 
-    for (var i = 0; i < entities.length; i++) {
-        entities[i].draw();
-    }
-
-    for (var i = 0; i < buildingsArray.length; i++) {
-        var building = buildingsArray[i];
+    for (var i = 0; i < buildings.length; i++) {
+        let building = buildings[i];
         ctx.beginPath();
-        ctx.rect(building.x, building.y, building.width, building.height);
+        ctx.rect(building.rect.x, building.rect.y, building.rect.width, building.rect.height);
         ctx.fillStyle = "#693996";
         ctx.fill();
         ctx.closePath();
     }
 
+    // Cycle through all entities and draw them
+    for (var i = 0; i < entities.length; i++) {
+        entities[i].draw();
+    }
+
+    // Get the correct healthbar image for the players health and draw it on the canvas
     var healthbar = getHealthbarImage();
     ctx.drawImage(healthbar, canvas.width - canvas.width * 0.45 - 20, 20, canvas.width * 0.45, canvas.width * 0.12);
 
+    // Set up the custom font and draw the players score on the canvas
     var fontSize = getFontSize(40);
     ctx.font = fontSize + 'px Score_Font';
     ctx.fillStyle = '#fff133';
@@ -417,11 +420,15 @@ class Entity {
 
     draw() {
         let sprite = this.sprite;
+        if (sprite == null)
+            return;
         ctx.drawImage(sprite.sprite, sprite.animationFrame * sprite.width, 0, sprite.width, sprite.height, this.rect.x, this.rect.y, this.rect.width, this.rect.height);
     }
 
     animationTick() {
         let sprite = this.sprite;
+        if (sprite == null)
+            return;
         sprite.animationTime += deltaTime;
         if (sprite.loop == true) {
             if (sprite.animationTime >= sprite.animationSpeed) {
@@ -453,10 +460,12 @@ class Entity {
     }
 
     onCollision(e) {
-        console.log(getType(this) + " collided with " + getType(e));
+        // Used to debug collisions
+        //console.log(getType(this) + " collided with " + getType(e));
     }
 }
 
+// Player class handles player movement and health
 class Player extends Entity {
     constructor(moveSpeed, rect, health, runSprite, jumpSprite, attackSprite, deathSprite) {
         super(moveSpeed, rect, runSprite);
