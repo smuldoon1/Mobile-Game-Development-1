@@ -122,6 +122,11 @@ function init() {
 }
 
 function update() {
+    for (var i = 0; i < entities.length; i++) {
+        entities[i].update();
+        entities[i].animationTick();
+    }
+
     if (timeSinceLastBuilding > maxTimeSinceLastBuilding) {
         var newBuilding = {
             x: canvas.width * 1.5,
@@ -171,41 +176,10 @@ function update() {
         if (fireball.rect.x > canvas.width) {
             fireballs.splice(i, 1);
         }
-
-        for (var j = 0; j < enemies.length; j++) {
-            let enemy = enemies[j];
-            if (fireball.rect.y + fireball.rect.height > enemy.rect.y &&
-                fireball.rect.y < enemy.rect.y + enemy.rect.height &&
-                fireball.rect.x + fireball.rect.width > enemy.rect.x &&
-                fireball.rect.x < enemy.rect.x + enemy.rect.width)
-            {
-                fireballs.splice(i, 1);
-                enemy.isAlive = false;
-                enemy.canAttack = false;
-                enemy.setSprite("dead");
-                enemyDeathSFX.play();
-                score += 50;
-            }
-        }
     }
     
     for (var i = 0; i < enemies.length; i++) {
         let enemy = enemies[i];
-        /*
-        if (player.rect.y + player.rect.height > enemy.rect.y &&
-            player.rect.y < enemy.rect.y + enemy.rect.height &&
-            player.rect.x + player.rect.width > enemy.rect.x &&
-            player.rect.x < enemy.rect.x + player.rect.width &&
-            enemy.canAttack == true) {
-            player.health--;
-            enemy.setSprite("attack");
-            enemy.isAttacking = true;
-            enemy.canAttack = false;
-            playerDamagedSFX.play();
-            if (player.health <= 0) {
-                player.die();
-            }
-        }*/
 
         if (enemy.rect.x < -building.width) {
             enemies.splice(i, 1);
@@ -268,8 +242,6 @@ function render() {
     ctx.drawImage(background, backgroundScroll, 0, backgroundWidth, background.height, 0, 0, canvas.width, canvas.height);
 
     for (var i = 0; i < entities.length; i++) {
-        entities[i].update();
-        entities[i].animationTick();
         entities[i].draw();
     }
 
@@ -341,7 +313,7 @@ function attack() {
         playerAttackSFX.play();
         fireballs.push(new Fireball(
             1728 / canvas.width,
-            new Rect(player.rect.x + player.rect.width * 0.65, player.rect.y + player.rect.height * 0.2, canvas.width * 0.04, canvas.width * 0.04),
+            new Rect(player.rect.x + player.rect.width * 0.65, player.rect.y + player.rect.height * 0.2, canvas.width * 0.16, canvas.width * 0.16),
             new Sprite(fireballSprite, 64, 64, 80, 6, true)
         ));
     }
@@ -437,7 +409,7 @@ class Entity {
                     this.rect.x + this.rect.width > e.rect.x &&
                     this.rect.x < e.rect.x + this.rect.width)
                 {
-                    this.collision(e);
+                    this.onCollision(e);
                 }
             }
         }
@@ -480,7 +452,7 @@ class Entity {
 
     }
 
-    collision(e) {
+    onCollision(e) {
         console.log(getType(this) + " collided with " + getType(e));
     }
 }
@@ -508,8 +480,8 @@ class Player extends Entity {
         }
     }
 
-    collision(e) {
-        super.collision(e);
+    onCollision(e) {
+        super.onCollision(e);
         if (getType(e) == "Enemy") {
             if (e.canAttack == true) {
                 e.setSprite("attack");
@@ -592,6 +564,20 @@ class Enemy extends Entity {
 class Fireball extends Entity {
     constructor(moveSpeed, rect, sprite) {
         super(moveSpeed, rect, sprite);
+    }
+
+    onCollision(e) {
+        super.onCollision(e);
+        if (getType(e) == "Enemy") {
+            if (e.isAlive) {
+                e.isAlive = false;
+                e.canAttack = false;
+                e.setSprite("dead");
+                enemyDeathSFX.play();
+                score += 50;
+                // destroy this fireball
+            }
+        }
     }
 }
 
