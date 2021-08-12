@@ -52,14 +52,6 @@ var initialVelocity;
 var initialJumpForce;
 var jumpFoldForce;
 
-var fireballArray;
-var fireballCooldown;
-var fireballSize;
-var fireballSpeed;
-
-var fireballAnimationTime;
-var fireballAnimationFrame;
-
 var buildingsArray;
 var timeSinceLastBuilding;
 var maxTimeSinceLastBuilding;
@@ -69,6 +61,8 @@ var buildingHeight;
 
 var player;
 var enemies = [];
+var fireballs = [];
+
 var entities = [];
 
 function init() {
@@ -104,14 +98,7 @@ function init() {
 
     velocity = initialVelocity;
 
-    fireballArray = [];
-    fireballCooldown = 0;
-    fireballCooldownTimer = 700;
-    fireballSize = canvas.width * 0.04;
     fireballSpeed = 1728 / canvas.width;
-
-    fireballAnimationTime = 0;
-    fireballAnimationFrame = 0;
 
     buildingsArray = [];
     timeSinceLastBuilding = 1080000 / canvas.width;
@@ -145,7 +132,7 @@ function update() {
         buildingsArray.push(newBuilding);
         if (newBuilding.width > canvas.width * 0.4 && Math.random() > 0.6) {
             enemies.push(new Enemy(
-                720 / canvas.width,
+                -720 / canvas.width,
                 new Rect(newBuilding.x + newBuilding.width * 0.75 - canvas.width * 0.075, newBuilding.y - canvas.width * 0.275, canvas.width * 0.15, canvas.width * 0.275),
                 new Sprite(enemyIdle, 18, 33, 150, 4, true),
                 new Sprite(enemyAttack, 23, 34, 100, 6, false),
@@ -178,63 +165,57 @@ function update() {
         }
     }
 
-    for (var i = 0; i < fireballArray.length; i++) {
-        let fireball = fireballArray[i];
-        fireball.x += deltaTime * fireballSpeed;
+    for (var i = 0; i < fireballs.length; i++) {
+        let fireball = fireballs[i];
 
-        if (fireball.x > canvas.width) {
-            fireballArray.splice(i, 1);
+        if (fireball.rect.x > canvas.width) {
+            fireballs.splice(i, 1);
         }
 
         for (var j = 0; j < enemies.length; j++) {
             let enemy = enemies[j];
-            if (fireball.y + fireballSize > enemy.rect.y &&
-                fireball.y < enemy.rect.y + enemy.rect.height &&
-                fireball.x + fireballSize * 2 > enemy.rect.x &&
-                fireball.x < enemy.rect.x + enemy.rect.width)
+            if (fireball.rect.y + fireball.rect.height > enemy.rect.y &&
+                fireball.rect.y < enemy.rect.y + enemy.rect.height &&
+                fireball.rect.x + fireball.rect.width > enemy.rect.x &&
+                fireball.rect.x < enemy.rect.x + enemy.rect.width)
             {
-                fireballArray.splice(i, 1);
+                fireballs.splice(i, 1);
                 enemy.isAlive = false;
                 enemy.canAttack = false;
-                enemy.changeState("dead");
-                enemy.animationTime = 0;
-                enemy.animationFrame = 0;
+                enemy.setSprite("dead");
                 enemyDeathSFX.play();
                 score += 50;
             }
         }
     }
-
+    
     for (var i = 0; i < enemies.length; i++) {
         let enemy = enemies[i];
-
-        if (!isPlayerDead)
-            enemy.rect.x -= deltaTime * runSpeed * speedMultiplier;
-
+        /*
         if (player.rect.y + player.rect.height > enemy.rect.y &&
             player.rect.y < enemy.rect.y + enemy.rect.height &&
             player.rect.x + player.rect.width > enemy.rect.x &&
             player.rect.x < enemy.rect.x + player.rect.width &&
             enemy.canAttack == true) {
             player.health--;
-            enemy.changeState("attack");
+            enemy.setSprite("attack");
             enemy.isAttacking = true;
             enemy.canAttack = false;
             playerDamagedSFX.play();
             if (player.health <= 0) {
-                die();
+                player.die();
             }
-        }
+        }*/
 
         if (enemy.rect.x < -building.width) {
             enemies.splice(i, 1);
         }
     }
 
-    if (fireballCooldown > 0) {
-        fireballCooldown -= deltaTime;
-        if (fireballCooldown < 0) {
-            fireballCooldown = 0;
+    if (player.attackCooldownTimer > 0) {
+        player.attackCooldownTimer -= deltaTime;
+        if (player.attackCooldownTimer < 0) {
+            player.attackCooldownTimer = 0;
         }
     }
 
@@ -261,8 +242,8 @@ function update() {
         jumpHeldTime = 0;
     }
 
-    if (player.rect.y > canvas.height && !isPlayerDead) {
-        die();
+    if (player.rect.y > canvas.height && player.isAlive) {
+        player.die();
         player.health = 0;
     }
 
@@ -270,15 +251,6 @@ function update() {
         backgroundScroll += deltaTime * 0.025 * speedMultiplier;
         if (backgroundScroll > background.width * 0.5) {
             backgroundScroll -= background.width * 0.5;
-        }
-    }
-
-    fireballAnimationTime += deltaTime;
-    if (fireballAnimationTime >= 80) {
-        fireballAnimationTime = 0;
-        fireballAnimationFrame++;
-        if (fireballAnimationFrame > 3) {
-            fireballAnimationFrame = 0;
         }
     }
 
@@ -296,6 +268,7 @@ function render() {
     ctx.drawImage(background, backgroundScroll, 0, backgroundWidth, background.height, 0, 0, canvas.width, canvas.height);
 
     for (var i = 0; i < entities.length; i++) {
+        entities[i].update();
         entities[i].animationTick();
         entities[i].draw();
     }
@@ -307,11 +280,6 @@ function render() {
         ctx.fillStyle = "#693996";
         ctx.fill();
         ctx.closePath();
-    }
-
-    for (var i = 0; i < fireballArray.length; i++) {
-        var fireball = fireballArray[i];
-        ctx.drawImage(fireballSprite, fireballAnimationFrame * 64, 0, 64, 64, fireball.x, fireball.y, fireballSize * 4, fireballSize * 4);
     }
 
     var healthbar = getHealthbarImage();
@@ -366,26 +334,17 @@ function jump() {
 }
 
 function attack() {
-    if (fireballCooldown <= 0 && !isPlayerDead) {
-        playerAnimationTime = 0;
-        playerAnimationFrame = 0;
+    if (player.attackCooldownTimer <= 0 && !isPlayerDead) {
         isPlayingAttackAnimation = true;
-        fireballCooldown = fireballCooldownTimer;
+        player.setSprite("attack");
+        player.attackCooldownTimer = player.attackCooldown;
         playerAttackSFX.play();
-        fireballArray.push({
-            x: player.rect.x + player.rect.width * 0.65,
-            y: player.rect.y + player.rect.height * 0.2
-        });
+        fireballs.push(new Fireball(
+            1728 / canvas.width,
+            new Rect(player.rect.x + player.rect.width * 0.65, player.rect.y + player.rect.height * 0.2, canvas.width * 0.04, canvas.width * 0.04),
+            new Sprite(fireballSprite, 64, 64, 80, 6, true)
+        ));
     }
-}
-
-function die() {
-    isPlayerDead = true;
-    animationTime = 0;
-    animationFrame = 0;
-    music.pause();
-    playerDeathSFX.play();
-    player.changeState("dead");
 }
 
 function getJumpIndex(velocity) {
@@ -455,12 +414,33 @@ function setScene(sceneName) {
     }
 }
 
+function getType(object) {
+    return object.constructor.name;
+}
+
 class Entity {
     constructor(moveSpeed, rect, sprite) {
         this.moveSpeed = moveSpeed;
         this.rect = rect;
         this.sprite = sprite;
         entities.push(this);
+    }
+
+    update() {
+        this.rect.x += deltaTime * this.moveSpeed * speedMultiplier;
+
+        for (var i = 0; i < entities.length; i++) {
+            let e = entities[i];
+            if (e !== this) {
+                if (this.rect.y + this.rect.height > e.rect.y &&
+                    this.rect.y < e.rect.y + e.rect.height &&
+                    this.rect.x + this.rect.width > e.rect.x &&
+                    this.rect.x < e.rect.x + this.rect.width)
+                {
+                    this.collision(e);
+                }
+            }
+        }
     }
 
     draw() {
@@ -491,8 +471,17 @@ class Entity {
         }
     }
 
+    setSprite(state) {
+        this.sprite.animationTime = 0;
+        this.sprite.animationFrame = 0;
+    }
+
     onAnimationEnd() {
 
+    }
+
+    collision(e) {
+        console.log(getType(this) + " collided with " + getType(e));
     }
 }
 
@@ -504,6 +493,12 @@ class Player extends Entity {
         this.jumpSprite = jumpSprite;
         this.attackSprite = attackSprite;
         this.deathSprite = deathSprite;
+        this.attackCooldown = 700;
+        this.attackCooldownTimer = 0;
+    }
+
+    get isAlive() {
+        return this.health > 0;
     }
 
     animationTick() {
@@ -513,7 +508,24 @@ class Player extends Entity {
         }
     }
 
-    changeState(state) {
+    collision(e) {
+        super.collision(e);
+        if (getType(e) == "Enemy") {
+            if (e.canAttack == true) {
+                e.setSprite("attack");
+                e.isAttacking = true;
+                e.canAttack = false;
+                this.health--;
+                playerDamagedSFX.play();
+                if (this.health <= 0) {
+                    this.die();
+                }
+            }
+        }
+    }
+
+    setSprite(state) {
+        super.setSprite(state);
         switch (state) {
             case "run":
                 this.sprite = this.runSprite;
@@ -533,9 +545,16 @@ class Player extends Entity {
         }
     }
 
+    die() {
+        this.health = 0;
+        player.setSprite("dead");
+        music.pause();
+        playerDeathSFX.play();
+    }
+
     onAnimationEnd() {
         if (this.sprite == this.attackSprite) {
-            this.changeState("run");
+            this.setSprite("run");
         }
     }
 }
@@ -551,7 +570,8 @@ class Enemy extends Entity {
         this.isAttacking = false;
     }
 
-    changeState(state) {
+    setSprite(state) {
+        super.setSprite(state);
         switch (state) {
             case "idle":
                 this.sprite = this.idleSprite;
