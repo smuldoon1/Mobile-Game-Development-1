@@ -59,6 +59,8 @@ var buildingGap;
 var buildingWidth;
 var buildingHeight;
 
+var timeSinceLastFrame = 0;
+
 var player;
 var enemies = [];
 var fireballs = [];
@@ -264,6 +266,9 @@ function render() {
     ctx.font = fontSize + 'px Score_Font';
     ctx.fillStyle = '#fff133';
     ctx.fillText("score: " + Math.round(score), canvas.width * 0.05, fontSize * 2.5);
+
+    // This is used to stop the flickering caused by calling the render function with setInterval();
+    requestAnimationFrame(render);
 }
 
 function touchStartHandler(e) {
@@ -368,7 +373,6 @@ function gameLoop() {
     previousDate = dateNow;
 
     update();
-    render();
 }
 
 function setScene(sceneName) {
@@ -434,13 +438,13 @@ class Entity {
             if (sprite.animationTime >= sprite.animationSpeed) {
                 sprite.animationTime = 0;
                 sprite.animationFrame++;
-                if (sprite.animationFrame > sprite.frameCount) {
+                if (sprite.animationFrame >= sprite.frameCount) {
                     sprite.animationFrame = 0;
                 }
             }
         }
         else {
-            if (sprite.animationTime >= sprite.animationSpeed && sprite.animationFrame < sprite.frameCount + 1) {
+            if (sprite.animationTime >= sprite.animationSpeed && sprite.animationFrame < sprite.frameCount) {
                 sprite.animationTime = 0;
                 sprite.animationFrame++;
             }
@@ -621,3 +625,5 @@ class Sprite {
 ctx.imageSmoothingEnabled = false; // Ensures sprites are not drawn blurry
 
 setScene("game_level"); // Start the game in the main menu scene
+
+requestAnimationFrame(render);
