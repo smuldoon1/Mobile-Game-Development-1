@@ -295,8 +295,7 @@ class Entity {
         this.rect.x += deltaTime * this.moveSpeed * speedMultiplier;
 
         // If an entity goes too far from the canvas, it is destroyed
-        if (this.rect.x < -this.rect.width || this.rect.x > canvas.width * 2 ||
-            this.rect.y < -this.rect.height || this.rect.y > canvas.height)
+        if (this.rect.x < -this.rect.width || this.rect.x > canvas.width * 2 || this.rect.y > canvas.height)
         {
             this.destroy();
         }
