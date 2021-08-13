@@ -125,27 +125,6 @@ function update() {
     }
     timeSinceLastBuilding += deltaTime * speedMultiplier;
 
-    player.isGrounded = false;
-    for (var i = 0; i < buildings.length; i++) {
-        var building = buildings[i];
-
-        if (player.rect.y + player.rect.height < building.rect.y + 30 &&
-            player.rect.y + player.rect.height > building.rect.y - 10 &&
-            player.rect.x + player.rect.width >= building.rect.x &&
-            player.rect.x <= building.rect.x + building.rect.width &&
-            player.velocity > 0) {
-            player.rect.y = building.rect.y - player.rect.height;
-            player.isGrounded = true;
-            if (player.sprite == player.jumpSprite) {
-                player.setSprite("run");
-            }
-        }
-
-        if (building.rect.x < -building.rect.width) {
-            buildings.splice(i, 1);
-        }
-    }
-
     for (var i = 0; i < fireballs.length; i++) {
         let fireball = fireballs[i];
 
@@ -153,58 +132,29 @@ function update() {
             fireballs.splice(i, 1);
         }
     }
+
+    for (var i = 0; i < buildings.length; i++) {
+        let building = buildings[i];
+
+        if (building.rect.x < -building.rect.width) {
+            buildings.splice(i, 1);
+        }
+    }
     
     for (var i = 0; i < enemies.length; i++) {
         let enemy = enemies[i];
 
-        if (enemy.rect.x < -building.rect.width) {
+        if (enemy.rect.x < -100) {
             enemies.splice(i, 1);
         }
     }
 
-    if (player.attackCooldownTimer > 0) {
-        player.attackCooldownTimer -= deltaTime;
-        if (player.attackCooldownTimer < 0) {
-            player.attackCooldownTimer = 0;
-        }
-    }
-
-    if (player.isGrounded) {
-        player.jumps = 2;
-        player.velocity = initialVelocity;
-    }
-    else {
-        if (player.jumps == 2) {
-            player.jumps = 1;
-        }
-        player.velocity += deltaTime * gravity;
-        player.rect.y += player.velocity * deltaTime;
-    }
-
-    if (leftPressed) {
-        if (player.isJumping && jumpHeldTime < maxJumpHoldTime) {
-            player.velocity -= jumpFoldForce * (jumpHeldTime / maxJumpHoldTime);
-            jumpHeldTime += deltaTime;
-        }
-    }
-    else {
-        player.isJumping = false;
-        jumpHeldTime = 0;
-    }
-
-    if (player.rect.y > canvas.height && player.isAlive) {
-        player.die();
-        player.health = 0;
-    }
-
+    // While the player is alive, the background should scroll and the score should increment
     if (player.isAlive) {
         backgroundScroll += deltaTime * 0.025 * speedMultiplier;
-        if (backgroundScroll > background.width * 0.5) {
+        if (backgroundScroll > background.width * 0.5)
             backgroundScroll -= background.width * 0.5;
-        }
-    }
 
-    if (player.isAlive) {
         score += deltaTime * 0.01 * speedMultiplier;
         speedMultiplier += deltaTime * 0.0000025;
         if (speedMultiplier > 1.5)
@@ -451,10 +401,72 @@ class Player extends Entity {
         return this.health > 0;
     }
 
+    update() {
+        super.update();
+
+        this.isGrounded = false;
+        // Cycle through all buildings and check if the player should be grounded
+        for (var i = 0; i < buildings.length; i++) {
+            var building = buildings[i];
+
+            // Check if the player is directly above a building and falling
+            if (this.rect.y + this.rect.height < building.rect.y + 30 &&
+                this.rect.y + this.rect.height > building.rect.y - 10 &&
+                this.rect.x + this.rect.width >= building.rect.x &&
+                this.rect.x <= building.rect.x + building.rect.width &&
+                this.velocity > 0)
+            {
+                // If so, the player is grounded. Correct their y-position and play the running animation
+                this.isGrounded = true;
+                this.rect.y = building.rect.y - this.rect.height;
+                if (this.sprite == this.jumpSprite) {
+                    this.setSprite("run");
+                }
+            }
+        }
+
+        // If the player is grounded they should stop falling their allowed jumps reset to 2
+        if (this.isGrounded) {
+            this.jumps = 2;
+            this.velocity = initialVelocity;
+        }
+        // Else, the player should fall and their maximum allowed jumps is set to 1
+        else {
+            if (this.jumps > 1)
+                this.jumps = 1;
+
+            this.velocity += deltaTime * gravity; // Increment velocity while falling to simulate acceleration
+            this.rect.y += this.velocity * deltaTime; // Update players y position
+        }
+
+        // If the jump input is held down for a short time while the player is jumping, the jump height should increase slightly
+        if (leftPressed) {
+            if (this.isJumping && jumpHeldTime < maxJumpHoldTime) {
+                this.velocity -= jumpFoldForce * (jumpHeldTime / maxJumpHoldTime);
+                jumpHeldTime += deltaTime;
+            }
+        }
+        else {
+            this.isJumping = false;
+            jumpHeldTime = 0;
+        }
+
+        // If the player falls to the bottom of the screen, they are killed
+        if (this.rect.y > canvas.height && this.isAlive)
+            this.die();
+
+        if (player.attackCooldownTimer > 0) {
+            player.attackCooldownTimer -= deltaTime;
+            if (player.attackCooldownTimer < 0) {
+                player.attackCooldownTimer = 0;
+            }
+        }
+    }
+
     // Override animationTick method so that the jump animation frame is dependant on the players velocity
     animationTick() {
         super.animationTick();
-        if (this.isJumping) {
+        if (!this.isGrounded) {
             this.sprite.animationFrame = Player.getJumpIndex(this.velocity);
         }
     }
