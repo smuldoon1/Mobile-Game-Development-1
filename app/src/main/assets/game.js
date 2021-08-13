@@ -26,9 +26,6 @@ var music = document.getElementById('gameMusic');
 var previousDate;
 var deltaTime;
 
-var rightPressed = false;
-var leftPressed = false;
-
 var backgroundScroll;
 var backgroundWidth;
 
@@ -93,8 +90,8 @@ function init() {
     ));
 
     // Add touch event listeners
-    document.addEventListener("touchstart", touchStartHandler, false);
-    document.addEventListener("touchend", touchEndHandler, false);
+    document.addEventListener("touchstart", Input.touchStartHandler, false);
+    document.addEventListener("touchend", Input.touchEndHandler, false);
 
     music.play();
 }
@@ -147,7 +144,7 @@ function render() {
     // Draw the background image
     ctx.drawImage(background, backgroundScroll, 0, backgroundWidth, background.height, 0, 0, canvas.width, canvas.height);
 
-    for (var i = 0; i < buildings.length; i++) {
+    for (let i = 0; i < buildings.length; i++) {
         let building = buildings[i];
         ctx.beginPath();
         ctx.rect(building.rect.x, building.rect.y, building.rect.width, building.rect.height);
@@ -157,16 +154,16 @@ function render() {
     }
 
     // Cycle through all entities and draw them
-    for (var i = 0; i < entities.length; i++) {
+    for (let i = 0; i < entities.length; i++) {
         entities[i].draw();
     }
 
     // Get the correct healthbar image for the players health and draw it on the canvas
-    var healthbar = getHealthbarImage();
+    let healthbar = getHealthbarImage();
     ctx.drawImage(healthbar, canvas.width - canvas.width * 0.45 - 20, 20, canvas.width * 0.45, canvas.width * 0.12);
 
     // Set up the custom font and draw the players score on the canvas
-    var fontSize = getFontSize(40);
+    let fontSize = getFontSize(40);
     ctx.font = fontSize + 'px Score_Font';
     ctx.fillStyle = '#fff133';
     ctx.fillText("score: " + Math.round(score), canvas.width * 0.05, fontSize * 2.5);
@@ -180,32 +177,6 @@ function render() {
 
     // RequestAnimationFrame used instead to stop the flickering caused by calling the render function with setInterval();
     requestAnimationFrame(render);
-}
-
-// Handles user touch up events
-function touchStartHandler(e) {
-    var touches = e.touches;
-
-    for (var i = 0; i < touches.length; i++) {
-        if (touches[i].pageX < canvas.width * 0.18) {
-            leftPressed = true;
-            rightPressed = false;
-            player.jump();
-        }
-        if (touches[i].pageX >= canvas.width * 0.18) {
-            rightPressed = true;
-            leftPressed = false;
-            player.attack();
-        }
-    }
-}
-
-// Handles user touch end events
-function touchEndHandler(e) {
-    if (e.touches.length == 0) {
-        leftPressed = false;
-        rightPressed = false;
-    }
 }
 
 function getRandomBuilding() {
@@ -224,7 +195,7 @@ function showGameOver() {
 function gameLoop() {
 
     // deltaTime is used to maintain more accurate timing regardless of any delay of setInterval being called
-    var dateNow = performance.now();
+    let dateNow = performance.now();
     deltaTime = dateNow - previousDate;
     previousDate = dateNow;
 
@@ -438,7 +409,7 @@ class Player extends Entity {
         }
 
         // If the jump input is held down for a short time while the player is jumping, the jump height should increase slightly
-        if (leftPressed) {
+        if (Input.leftMousePressed) {
             if (this.isJumping && jumpHeldTime < maxJumpHoldTime) {
                 this.velocity -= jumpFoldForce * (jumpHeldTime / maxJumpHoldTime);
                 jumpHeldTime += deltaTime;
@@ -676,6 +647,38 @@ class Sprite {
         this.loop = loop;
         this.animationTime = 0;
         this.animationFrame = 0;
+    }
+}
+
+// Input class handles player input
+class Input {
+    static leftMousePressed; // Keeps track of the left side of the screen being pressed
+    static rightMousePressed; // Keeps track of the right side of the screen being pressed
+
+    // Handles user touch up events
+    static touchStartHandler(e) {
+        let touches = e.touches;
+
+        for (let i = 0; i < touches.length; i++) {
+            if (touches[i].pageX < canvas.width * 0.18) {
+                Input.leftMousePressed = true;
+                Input.rightMousePressed = false;
+                player.jump();
+            }
+            if (touches[i].pageX >= canvas.width * 0.18) {
+                Input.rightMousePressed = true;
+                Input.leftMousePressed = false;
+                player.attack();
+            }
+        }
+    }
+
+    // Handles user touch end events
+    static touchEndHandler(e) {
+        if (e.touches.length == 0) {
+            Input.leftMousePressed = false;
+            Input.rightMousePressed = false;
+        }
     }
 }
 
