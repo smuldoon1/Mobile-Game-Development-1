@@ -26,8 +26,8 @@ var music = document.getElementById('gameMusic');
 var previousDate;
 var deltaTime;
 
-var rightPressed;
-var leftPressed;
+var rightPressed = false;
+var leftPressed = false;
 
 var backgroundScroll;
 var backgroundWidth;
@@ -71,9 +71,6 @@ function init() {
     initialJumpForce = -3350 / canvas.height;
     jumpFoldForce = 100 / canvas.height;
 
-    fireballSpeed = 1728 / canvas.width;
-
-    buildingsArray = [];
     timeSinceLastBuilding = 1080000 / canvas.width;
     maxTimeSinceLastBuilding = 1620000 / canvas.width;
     buildingGap = 972000 / canvas.width;
@@ -82,7 +79,7 @@ function init() {
         0,
         new Rect(canvas.width * 0.1, canvas.height * 0.5 - canvas.width * 0.2, canvas.width * 0.2, canvas.width * 0.2),
         new Sprite(playerRunning, 32, 32, 100, 6, true),
-        new Sprite(playerJumping, 31, 33, 100, 4, true),
+        new Sprite(playerJumping, 31, 33, 100, 4, false),
         new Sprite(playerAttack, 36, 32, 100, 6, false),
         new Sprite(playerDeath, 23, 35, 150, 6, false)
     );
@@ -92,9 +89,6 @@ function init() {
         new Rect(0, canvas.height * 0.5, canvas.width * 1.5, canvas.height),
         null
     ));
-
-    rightPressed = false;
-    leftPressed = false;
 
     document.addEventListener("touchstart", touchStartHandler, false);
     document.addEventListener("touchend", touchEndHandler, false);
@@ -136,10 +130,12 @@ function update() {
             player.rect.y + player.rect.height > building.rect.y - 10 &&
             player.rect.x + player.rect.width >= building.rect.x &&
             player.rect.x <= building.rect.x + building.rect.width &&
-            player.velocity > 0)
-        {
+            player.velocity > 0) {
             player.rect.y = building.rect.y - player.rect.height;
             player.isGrounded = true;
+            if (player.sprite == player.jumpSprite) {
+                player.setSprite("run");
+            }
         }
 
         if (building.rect.x < -building.rect.width) {
@@ -211,13 +207,11 @@ function update() {
         if (speedMultiplier > 1.5)
             speedMultiplier = 1.5;
     }
-
-    console.log(player.rect.x + ", " + player.rect.y)
 }
 
 // Handles rendering of sprites and UI elements
 function render() {
-
+    
     // Clear the canvas at the beginning of each frame
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -386,25 +380,28 @@ class Entity {
         let sprite = this.sprite;
         if (sprite == null)
             return;
-        sprite.animationTime += deltaTime;
         if (sprite.loop == true) {
             if (sprite.animationTime >= sprite.animationSpeed) {
                 sprite.animationTime = 0;
                 sprite.animationFrame++;
                 if (sprite.animationFrame >= sprite.frameCount) {
                     sprite.animationFrame = 0;
+                    this.onAnimationEnd();
                 }
             }
         }
         else {
-            if (sprite.animationTime >= sprite.animationSpeed && sprite.animationFrame < sprite.frameCount) {
-                sprite.animationTime = 0;
-                sprite.animationFrame++;
-            }
-            else {
-                this.onAnimationEnd();
+            if (sprite.animationTime >= sprite.animationSpeed) {
+                if (sprite.animationFrame < sprite.frameCount - 1) {
+                    sprite.animationTime = 0;
+                    sprite.animationFrame++;
+                }
+                else {
+                    this.onAnimationEnd();
+                }
             }
         }
+        sprite.animationTime += deltaTime;
     }
 
     setSprite(state) {
@@ -443,10 +440,10 @@ class Player extends Entity {
     get isAlive() {
         return this.health > 0;
     }
-
+    
     animationTick() {
         super.animationTick();
-        if (!this.isGrounded) {
+        if (this.isJumping) {
             this.sprite.animationFrame = getJumpIndex(this.velocity);
         }
     }
@@ -528,7 +525,7 @@ class Player extends Entity {
     }
 
     onAnimationEnd() {
-        if (this.sprite == this.attackSprite) {
+        if (this.sprite === this.attackSprite) {
             this.setSprite("run");
         }
     }
