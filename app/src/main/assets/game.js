@@ -97,11 +97,13 @@ function init() {
 }
 
 function update() {
+    // Animate and update each entity
     for (var i = 0; i < entities.length; i++) {
         entities[i].animationTick();
         entities[i].update();
     }
 
+    // Building spawning
     if (timeSinceLastBuilding > maxTimeSinceLastBuilding) {
         let newBuilding = new Building(
             -720 / canvas.width,
@@ -109,6 +111,8 @@ function update() {
             null
         );
         buildings.push(newBuilding);
+
+        // Occasionally spawn an enemy on top of the building
         if (newBuilding.rect.width > canvas.width * 0.4 && Math.random() > 0.6) {
             enemies.push(new Enemy(
                 -720 / canvas.width,
