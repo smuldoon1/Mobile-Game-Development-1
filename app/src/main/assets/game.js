@@ -172,15 +172,13 @@ function render() {
     ctx.fillText("score: " + Math.round(score), canvas.width * 0.05, fontSize * 2.5);
 
     // Entity debugging
-    /*
-    ctx.fillStyle = '#0000ff';
-    ctx.fillText("entites: " + entities.length, canvas.width * 0.05, fontSize * 4.5);
-    ctx.fillText("enemies: " + enemies.length, canvas.width * 0.05, fontSize * 6.5);
-    ctx.fillText("fireballs: " + fireballs.length, canvas.width * 0.05, fontSize * 8.5);
-    ctx.fillText("buildings: " + buildings.length, canvas.width * 0.05, fontSize * 10.5);
-    */
+    //ctx.fillStyle = '#0000ff';
+    //ctx.fillText("entites: " + entities.length, canvas.width * 0.05, fontSize * 4.5);
+    //ctx.fillText("enemies: " + enemies.length, canvas.width * 0.05, fontSize * 6.5);
+    //ctx.fillText("fireballs: " + fireballs.length, canvas.width * 0.05, fontSize * 8.5);
+    //ctx.fillText("buildings: " + buildings.length, canvas.width * 0.05, fontSize * 10.5);
 
-    // This is used to stop the flickering caused by calling the render function with setInterval();
+    // RequestAnimationFrame used instead to stop the flickering caused by calling the render function with setInterval();
     requestAnimationFrame(render);
 }
 
@@ -617,6 +615,13 @@ class Fireball extends Entity {
         super(moveSpeed, rect, sprite);
     }
 
+    update() {
+        super.update();
+        // Destroy fireballs as soon as they go off the right side of the screen
+        if (this.rect.x > canvas.width)
+            this.destroy();
+    }
+
     onCollision(e) {
         super.onCollision(e);
 
@@ -628,7 +633,7 @@ class Fireball extends Entity {
                 e.setSprite("dead");
                 enemyDeathSFX.play();
                 score += 50;
-                // destroy this fireball on collision with enemy
+                this.destroy();
             }
         }
     }
