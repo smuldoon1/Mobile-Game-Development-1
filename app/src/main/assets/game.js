@@ -75,6 +75,7 @@ function init() {
     maxTimeSinceLastBuilding = 1620000 / canvas.width;
     buildingGap = 972000 / canvas.width;
 
+    // Spawn the player
     player = new Player(
         0,
         new Rect(canvas.width * 0.1, canvas.height * 0.5 - canvas.width * 0.2, canvas.width * 0.2, canvas.width * 0.2),
@@ -84,12 +85,14 @@ function init() {
         new Sprite(playerDeath, 23, 35, 150, 6, false)
     );
 
+    // Spawn the building the player initially starts on top of
     buildings.push(new Building(
         -720 / canvas.width,
         new Rect(0, canvas.height * 0.5, canvas.width * 1.5, canvas.height),
         null
     ));
 
+    // Add touch event listeners
     document.addEventListener("touchstart", touchStartHandler, false);
     document.addEventListener("touchend", touchEndHandler, false);
 
@@ -211,7 +214,7 @@ function update() {
 
 // Handles rendering of sprites and UI elements
 function render() {
-    
+
     // Clear the canvas at the beginning of each frame
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -246,6 +249,7 @@ function render() {
     requestAnimationFrame(render);
 }
 
+// Handles user touch up events
 function touchStartHandler(e) {
     var touches = e.touches;
 
@@ -263,6 +267,7 @@ function touchStartHandler(e) {
     }
 }
 
+// Handles user touch end events
 function touchEndHandler(e) {
     if (e.touches.length == 0) {
         leftPressed = false;
@@ -274,21 +279,50 @@ function getRandomBuilding() {
 
 }
 
-function getJumpIndex(velocity) {
-    if (velocity < -0.2) {
-        return 0;
-    }
-    else if (velocity < 0) {
-        return 1;
-    }
-    else if (velocity < 0.5) {
-        return 2;
-    }
-    else {
-        return 3;
+function showMainMenu() {
+
+}
+
+function showGameOver() {
+
+}
+
+// Called at a set interval to update the games entities and the deltaTime
+function gameLoop() {
+
+    // deltaTime is used to maintain more accurate timing regardless of any delay of setInterval being called
+    var dateNow = performance.now();
+    deltaTime = dateNow - previousDate;
+    previousDate = dateNow;
+
+    update();
+}
+
+// Set the game scene
+function setScene(sceneName) {
+    switch (sceneName) {
+        case "main_menu":
+            clearInterval(gameLoopInterval);
+            showMainMenu();
+            break;
+        case "game_level":
+            init(); // Sets up game variables
+            gameLoopInterval = setInterval(gameLoop, 10); // Starts the game loop so the update and render functions are called every 10 milliseconds
+            break;
+        case "game_over":
+            showGameOver();
+            break;
+        default:
+            break;
     }
 }
 
+// Get the Class name of an object
+function getType(object) {
+    return object.constructor.name;
+}
+
+// Get the correct healthbar image to display
 function getHealthbarImage() {
     switch (player.health) {
         case 0:
@@ -302,48 +336,12 @@ function getHealthbarImage() {
     }
 }
 
+// Get an expected font size for the canvas size
 function getFontSize(relativeSize) {
     return canvas.width * 0.001 * relativeSize;
 }
 
-function showMainMenu() {
-
-}
-
-function showGameOver() {
-
-}
-
-function gameLoop() {
-    var dateNow = performance.now();
-    deltaTime = dateNow - previousDate;
-    previousDate = dateNow;
-
-    update();
-}
-
-function setScene(sceneName) {
-    switch (sceneName) {
-        case "main_menu":
-            clearInterval(gameLoopInterval);
-            showMainMenu();
-            break;
-        case "game_level":
-            init(); // Sets up game variables
-            setInterval(gameLoop, 10); // Starts the game loop so the update and render functions are called every 10 milliseconds
-            break;
-        case "game_over":
-            showGameOver();
-            break;
-        default:
-            break;
-    }
-}
-
-function getType(object) {
-    return object.constructor.name;
-}
-
+// Entity class is a superclass that the player, enemies and all other gameplay objects extend from
 class Entity {
     constructor(moveSpeed, rect, sprite) {
         this.moveSpeed = moveSpeed;
@@ -352,9 +350,13 @@ class Entity {
         entities.push(this);
     }
 
+    // Called at a set interval to update any physics or non-rendering functionality of the entity
     update() {
+
+        // Move entities to give the illusion that the player is moving
         this.rect.x += deltaTime * this.moveSpeed * speedMultiplier;
 
+        // Check for collisions
         for (var i = 0; i < entities.length; i++) {
             let e = entities[i];
             if (e !== this) {
@@ -369,6 +371,7 @@ class Entity {
         }
     }
 
+    // Draws the entities current sprite and animation frame to the canvas
     draw() {
         let sprite = this.sprite;
         if (sprite == null)
@@ -376,20 +379,24 @@ class Entity {
         ctx.drawImage(sprite.sprite, sprite.animationFrame * sprite.width, 0, sprite.width, sprite.height, this.rect.x, this.rect.y, this.rect.width, this.rect.height);
     }
 
+    // Animates sprites over time
     animationTick() {
         let sprite = this.sprite;
         if (sprite == null)
             return;
+
+        // Loop the sprite animation if the sprites loop property is set to true
         if (sprite.loop == true) {
             if (sprite.animationTime >= sprite.animationSpeed) {
                 sprite.animationTime = 0;
                 sprite.animationFrame++;
                 if (sprite.animationFrame >= sprite.frameCount) {
                     sprite.animationFrame = 0;
-                    this.onAnimationEnd();
                 }
             }
         }
+        // If loop property is set to false, the animation should stop after the last frame is drawn
+        // and the onAnimationEnd method is called
         else {
             if (sprite.animationTime >= sprite.animationSpeed) {
                 if (sprite.animationFrame < sprite.frameCount - 1) {
@@ -404,15 +411,18 @@ class Entity {
         sprite.animationTime += deltaTime;
     }
 
+    // Whenever a sprite is changed, reset the animation time and frame variables
     setSprite(state) {
         this.sprite.animationTime = 0;
         this.sprite.animationFrame = 0;
     }
 
+    // Allows classes to handle what should happen after a non-looped animation ends
     onAnimationEnd() {
 
     }
 
+    // Called every frame for every collision this entity is making with another
     onCollision(e) {
         // Used to debug collisions
         //console.log(getType(this) + " collided with " + getType(e));
@@ -440,16 +450,26 @@ class Player extends Entity {
     get isAlive() {
         return this.health > 0;
     }
-    
+
+    // Override animationTick method so that the jump animation frame is dependant on the players velocity
     animationTick() {
         super.animationTick();
         if (this.isJumping) {
-            this.sprite.animationFrame = getJumpIndex(this.velocity);
+            this.sprite.animationFrame = Player.getJumpIndex(this.velocity);
+        }
+    }
+
+    onAnimationEnd() {
+        // Play the run animation at the end of the attack animation
+        if (this.sprite === this.attackSprite) {
+            this.setSprite("run");
         }
     }
 
     onCollision(e) {
         super.onCollision(e);
+
+        // Take damage if the player collides with an enemy
         if (getType(e) == "Enemy") {
             if (e.canAttack == true) {
                 e.setSprite("attack");
@@ -464,6 +484,7 @@ class Player extends Entity {
         }
     }
 
+    // Lets the players sprite be changed
     setSprite(state) {
         super.setSprite(state);
         switch (state) {
@@ -493,6 +514,21 @@ class Player extends Entity {
         playerDeathSFX.play();
     }
 
+    // Called when the player taps the right-hand side of the screen
+    attack() {
+        if (this.attackCooldownTimer <= 0 && this.isAlive) {
+            this.isPlayingAttackAnimation = true;
+            this.setSprite("attack");
+            this.attackCooldownTimer = player.attackCooldown;
+            playerAttackSFX.play();
+            fireballs.push(new Fireball(
+                1728 / canvas.width,
+                new Rect(this.rect.x + this.rect.width * 0.65, this.rect.y + this.rect.height * 0.2, canvas.width * 0.16, canvas.width * 0.16),
+                new Sprite(fireballSprite, 64, 64, 80, 6, true)
+            ));
+        }
+    }
+
     // Called when the player taps the left-hand side of the screen
     jump() {
         if (this.jumps > 0 && !this.isJumping && this.isAlive) {
@@ -509,28 +545,23 @@ class Player extends Entity {
         }
     }
 
-    // Called when the player taps the right-hand side of the screen
-    attack() {
-        if (this.attackCooldownTimer <= 0 && this.isAlive) {
-            this.isPlayingAttackAnimation = true;
-            this.setSprite("attack");
-            this.attackCooldownTimer = player.attackCooldown;
-            playerAttackSFX.play();
-            fireballs.push(new Fireball(
-                1728 / canvas.width,
-                new Rect(this.rect.x + this.rect.width * 0.65, this.rect.y + this.rect.height * 0.2, canvas.width * 0.16, canvas.width * 0.16),
-                new Sprite(fireballSprite, 64, 64, 80, 6, true)
-            ));
+    static getJumpIndex(velocity) {
+        if (velocity < -0.2) {
+            return 0;
         }
-    }
-
-    onAnimationEnd() {
-        if (this.sprite === this.attackSprite) {
-            this.setSprite("run");
+        else if (velocity < 0) {
+            return 1;
+        }
+        else if (velocity < 0.5) {
+            return 2;
+        }
+        else {
+            return 3;
         }
     }
 }
 
+// Enemy class handles enemy functionality
 class Enemy extends Entity {
     constructor(moveSpeed, rect, idleSprite, attackSprite, deathSprite) {
         super(moveSpeed, rect, idleSprite);
@@ -542,6 +573,7 @@ class Enemy extends Entity {
         this.isAttacking = false;
     }
 
+    // Lets enemy sprites be changed
     setSprite(state) {
         super.setSprite(state);
         switch (state) {
@@ -561,6 +593,7 @@ class Enemy extends Entity {
     }
 }
 
+// Fireball class handles players ranged attack collisions
 class Fireball extends Entity {
     constructor(moveSpeed, rect, sprite) {
         super(moveSpeed, rect, sprite);
@@ -568,6 +601,8 @@ class Fireball extends Entity {
 
     onCollision(e) {
         super.onCollision(e);
+
+        // Destroy enemies when a fireball collides with them
         if (getType(e) == "Enemy") {
             if (e.isAlive) {
                 e.isAlive = false;
@@ -575,18 +610,20 @@ class Fireball extends Entity {
                 e.setSprite("dead");
                 enemyDeathSFX.play();
                 score += 50;
-                // destroy this fireball
+                // destroy this fireball on collision with enemy
             }
         }
     }
 }
 
+// Building class handles all building spawning functionality
 class Building extends Entity {
     constructor(moveSpeed, rect, sprite) {
         super(moveSpeed, rect, sprite);
     }
 }
 
+// All entities have a rect that is used to store their position and size
 class Rect {
     constructor(x, y, width, height) {
         this.x = x;
@@ -596,6 +633,7 @@ class Rect {
     }
 }
 
+// Sprite class handles sprite animation methods
 class Sprite {
     constructor(sprite, width, height, animationSpeed, frameCount, loop) {
         this.sprite = sprite;
@@ -611,6 +649,5 @@ class Sprite {
 
 ctx.imageSmoothingEnabled = false; // Ensures sprites are not drawn blurry
 
+requestAnimationFrame(render); // Start drawing to the canvas
 setScene("game_level"); // Start the game in the main menu scene
-
-requestAnimationFrame(render);
