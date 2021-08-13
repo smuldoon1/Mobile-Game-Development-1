@@ -101,8 +101,8 @@ function init() {
 
 function update() {
     for (var i = 0; i < entities.length; i++) {
-        entities[i].update();
         entities[i].animationTick();
+        entities[i].update();
     }
 
     if (timeSinceLastBuilding > maxTimeSinceLastBuilding) {
@@ -124,30 +124,6 @@ function update() {
         timeSinceLastBuilding = (Math.random() * buildingGap) - newBuilding.rect.width;
     }
     timeSinceLastBuilding += deltaTime * speedMultiplier;
-
-    for (var i = 0; i < fireballs.length; i++) {
-        let fireball = fireballs[i];
-
-        if (fireball.rect.x > canvas.width) {
-            fireballs.splice(i, 1);
-        }
-    }
-
-    for (var i = 0; i < buildings.length; i++) {
-        let building = buildings[i];
-
-        if (building.rect.x < -building.rect.width) {
-            buildings.splice(i, 1);
-        }
-    }
-    
-    for (var i = 0; i < enemies.length; i++) {
-        let enemy = enemies[i];
-
-        if (enemy.rect.x < -100) {
-            enemies.splice(i, 1);
-        }
-    }
 
     // While the player is alive, the background should scroll and the score should increment
     if (player.isAlive) {
@@ -194,6 +170,15 @@ function render() {
     ctx.font = fontSize + 'px Score_Font';
     ctx.fillStyle = '#fff133';
     ctx.fillText("score: " + Math.round(score), canvas.width * 0.05, fontSize * 2.5);
+
+    // Entity debugging
+    /*
+    ctx.fillStyle = '#0000ff';
+    ctx.fillText("entites: " + entities.length, canvas.width * 0.05, fontSize * 4.5);
+    ctx.fillText("enemies: " + enemies.length, canvas.width * 0.05, fontSize * 6.5);
+    ctx.fillText("fireballs: " + fireballs.length, canvas.width * 0.05, fontSize * 8.5);
+    ctx.fillText("buildings: " + buildings.length, canvas.width * 0.05, fontSize * 10.5);
+    */
 
     // This is used to stop the flickering caused by calling the render function with setInterval();
     requestAnimationFrame(render);
@@ -291,6 +276,11 @@ function getFontSize(relativeSize) {
     return canvas.width * 0.001 * relativeSize;
 }
 
+// Remove an object from an array
+function removeFromArray(array, object) {
+    array.splice(array.indexOf(object), 1);
+}
+
 // Entity class is a superclass that the player, enemies and all other gameplay objects extend from
 class Entity {
     constructor(moveSpeed, rect, sprite) {
@@ -305,6 +295,13 @@ class Entity {
 
         // Move entities to give the illusion that the player is moving
         this.rect.x += deltaTime * this.moveSpeed * speedMultiplier;
+
+        // If an entity goes too far from the canvas, it is destroyed
+        if (this.rect.x < -this.rect.width || this.rect.x > canvas.width * 2 ||
+            this.rect.y < -this.rect.height || this.rect.y > canvas.height)
+        {
+            this.destroy();
+        }
 
         // Check for collisions
         for (var i = 0; i < entities.length; i++) {
@@ -377,6 +374,10 @@ class Entity {
         // Used to debug collisions
         //console.log(getType(this) + " collided with " + getType(e));
     }
+
+    destroy() {
+        removeFromArray(entities, this);
+    }
 }
 
 // Player class handles player movement and health
@@ -410,8 +411,8 @@ class Player extends Entity {
             var building = buildings[i];
 
             // Check if the player is directly above a building and falling
-            if (this.rect.y + this.rect.height < building.rect.y + 30 &&
-                this.rect.y + this.rect.height > building.rect.y - 10 &&
+            if (this.rect.y + this.rect.height < building.rect.y + 50 &&
+                this.rect.y + this.rect.height > building.rect.y - 30 &&
                 this.rect.x + this.rect.width >= building.rect.x &&
                 this.rect.x <= building.rect.x + building.rect.width &&
                 this.velocity > 0)
@@ -603,6 +604,11 @@ class Enemy extends Entity {
                 break;
         }
     }
+
+    destroy() {
+        super.destroy();
+        removeFromArray(enemies, this);
+    }
 }
 
 // Fireball class handles players ranged attack collisions
@@ -626,12 +632,22 @@ class Fireball extends Entity {
             }
         }
     }
+
+    destroy() {
+        super.destroy();
+        removeFromArray(fireballs, this);
+    }
 }
 
 // Building class handles all building spawning functionality
 class Building extends Entity {
     constructor(moveSpeed, rect, sprite) {
         super(moveSpeed, rect, sprite);
+    }
+
+    destroy() {
+        super.destroy();
+        removeFromArray(buildings, this);
     }
 }
 
