@@ -29,6 +29,13 @@ class Enemy extends Entity {
         }
     }
 
+    onAnimationEnd() {
+        // Play the idle animation at the end of the attack animation
+        if (this.sprite === this.attackSprite) {
+            this.setSprite("idle");
+        }
+    }
+
     destroy() {
         super.destroy();
         removeFromArray(enemies, this);

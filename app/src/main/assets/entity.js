@@ -10,8 +10,11 @@ class Entity {
     // Called at a set interval to update any physics or non-rendering functionality of the entity
     update() {
 
-        // Move entities to give the illusion that the player is moving
-        this.rect.x += deltaTime * this.moveSpeed * speedMultiplier;
+        // Workaround to make buildings and enemies stop moving once the player has died
+        if (player.isAlive || this.moveSpeed > 0) {
+            // Move all entities to give the illusion that the player is moving
+            this.rect.x += deltaTime * this.moveSpeed * speedMultiplier;
+        }
 
         // If an entity goes out of bounds, it is destroyed
         if (this.rect.x < -this.rect.width * 2 || this.rect.y > canvas.height) {
