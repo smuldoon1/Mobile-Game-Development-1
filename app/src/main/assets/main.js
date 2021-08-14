@@ -128,15 +128,6 @@ function render() {
     // Draw the background image
     ctx.drawImage(background, backgroundScroll, 0, backgroundWidth, background.height, 0, 0, canvas.width, canvas.height);
 
-    for (let i = 0; i < buildings.length; i++) {
-        let building = buildings[i];
-        ctx.beginPath();
-        ctx.rect(building.rect.x, building.rect.y, building.rect.width, building.rect.height);
-        ctx.fillStyle = "#693996";
-        ctx.fill();
-        ctx.closePath();
-    }
-
     // Cycle through all entities and draw them
     for (let i = 0; i < entities.length; i++) {
         entities[i].draw();
