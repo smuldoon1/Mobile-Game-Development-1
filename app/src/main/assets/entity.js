@@ -13,8 +13,8 @@ class Entity {
         // Move entities to give the illusion that the player is moving
         this.rect.x += deltaTime * this.moveSpeed * speedMultiplier;
 
-        // If an entity goes too far from the canvas, it is destroyed
-        if (this.rect.x < -this.rect.width * 2 || this.rect.x > canvas.width * 2 || this.rect.y > canvas.height) {
+        // If an entity goes out of bounds, it is destroyed
+        if (this.rect.x < -this.rect.width * 2 || this.rect.y > canvas.height) {
             this.destroy();
         }
 

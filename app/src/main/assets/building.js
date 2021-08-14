@@ -24,6 +24,15 @@ class Building extends Entity {
                     new Sprite(enemyDeath, 36, 36, 1.8, 1, 100, 6, false)
                 ));
             }
+            // Rarely, a powerup is spawned above and to the right of a building
+            if (Math.random() > 0.9) {
+                new Powerup(
+                    -720 / canvas.width,
+                    new Rect(newBuilding.rect.x + newBuilding.rect.width + canvas.width * 0.2, newBuilding.rect.y - canvas.width * 0.5, canvas.width * 0.08, canvas.width * 0.08),
+                    new Sprite(healthPowerup, 16, 16, 1, 1, 100, 8, true),
+                    "health"
+                );
+            }
             timeSinceLastBuilding = (Math.random() * buildingGap) - newBuilding.rect.width;
         }
         timeSinceLastBuilding += deltaTime * speedMultiplier;

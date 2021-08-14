@@ -9,6 +9,7 @@ var enemyIdle = document.getElementById('enemyIdle');
 var enemyDeath = document.getElementById('enemyDeath');
 var enemyAttack = document.getElementById('enemyAttack');
 var fireballSprite = document.getElementById('fireball');
+var healthPowerup = document.getElementById('healthPowerup');
 var healthbarEmpty = document.getElementById('healthbarEmpty');
 var healthbarNearDeath = document.getElementById('healthbarNearDeath');
 var healthbarDamaged = document.getElementById('healthbarDamaged');
