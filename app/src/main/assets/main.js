@@ -22,6 +22,7 @@ var playerDamagedSFX = document.getElementById('playerDamagedSFX');
 var playerDeathSFX = document.getElementById('playerDeathSFX');
 var playerAttackSFX = document.getElementById('playerAttackSFX');
 var enemyDeathSFX = document.getElementById('enemyDeathSFX');
+var powerupSFX = document.getElementById('powerupSFX');
 var music = document.getElementById('gameMusic');
 
 var previousDate;

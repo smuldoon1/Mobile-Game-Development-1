@@ -9,4 +9,5 @@ Enemy attack/player damaged sound - https://freesound.org/people/Cigaro30/sounds
 Player death - https://freesound.org/people/myfox14/sounds/382310/
 Player attack sound - https://freesound.org/people/notyermom/sounds/434834/
 Enemy death sound - https://freesound.org/people/Paul368/sounds/264062/
+Powerup sound - https://freesound.org/people/AbbasGamez/sounds/411443/
 Score font - https://www.dafont.com/8-bit-pusab.font
