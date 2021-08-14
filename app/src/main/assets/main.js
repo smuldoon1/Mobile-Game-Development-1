@@ -83,6 +83,7 @@ function init() {
         new Sprite(playerAttack, 36, 32, 1, 1, 100, 6, false),
         new Sprite(playerDeath, 23, 35, 0.75, 1, 150, 6, false)
     );
+    player.setDrawOrder(1000); // Give player an arbitrarily high draw order to make sure it is drawn in front of other entities
 
     // Spawn the building the player initially starts on top of
     buildings.push(new Building(
@@ -225,6 +226,11 @@ function getFontSize(relativeSize) {
 // Remove an object from an array
 function removeFromArray(array, object) {
     array.splice(array.indexOf(object), 1);
+}
+
+// Sort entities by their draw order
+function sortByDrawOrder(a, b) {
+    return a.drawOrder - b.drawOrder;
 }
 
 ctx.imageSmoothingEnabled = false; // Ensures sprites are not drawn blurry

@@ -4,7 +4,9 @@ class Entity {
         this.moveSpeed = moveSpeed;
         this.rect = rect;
         this.sprite = sprite;
+        this.drawOrder = 0;
         entities.push(this);
+        entities.sort(sortByDrawOrder);
     }
 
     // Called at a set interval to update any physics or non-rendering functionality of the entity
@@ -79,6 +81,13 @@ class Entity {
     setSprite(state) {
         this.sprite.animationTime = 0;
         this.sprite.animationFrame = 0;
+    }
+
+    // Allows for control of what entities are drawn first, a lower draw order is drawn before an entity with a higher draw order
+    // Entities with the same draw order will be drawn in the order they were created
+    setDrawOrder(drawOrder) {
+        this.drawOrder = drawOrder;
+        entities.sort(sortByDrawOrder);
     }
 
     // Allows classes to handle what should happen after a non-looped animation ends
