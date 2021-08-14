@@ -20,10 +20,9 @@ class Powerup extends Entity {
                     console.log("Invalid powerup type: " + type);
                     break;
             }
+            powerupSFX.play(); // Play powerup pickup sound
+            score += 100; // Give the player 100 score
+            this.destroy(); // Destroy powerup
         }
-
-        powerupSFX.play(); // Play powerup pickup sound
-        score += 100; // Give the player 100 score
-        this.destroy(); // Destroy powerup
     }
 }
