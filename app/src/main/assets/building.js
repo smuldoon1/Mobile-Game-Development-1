@@ -19,9 +19,9 @@ class Building extends Entity {
                 enemies.push(new Enemy(
                     -720 / canvas.width,
                     new Rect(newBuilding.rect.x + newBuilding.rect.width * 0.75 - canvas.width * 0.075, newBuilding.rect.y - canvas.width * 0.275, canvas.width * 0.15, canvas.width * 0.275),
-                    new Sprite(enemyIdle, 18, 33, 150, 4, true),
-                    new Sprite(enemyAttack, 23, 34, 100, 6, false),
-                    new Sprite(enemyDeath, 36, 34, 100, 6, false)
+                    new Sprite(enemyIdle, 36, 36, 1.8, 1, 150, 4, true),
+                    new Sprite(enemyAttack, 36, 36, 1.8, 1, 100, 6, false),
+                    new Sprite(enemyDeath, 36, 36, 1.8, 1, 100, 6, false)
                 ));
             }
             timeSinceLastBuilding = (Math.random() * buildingGap) - newBuilding.rect.width;

@@ -76,10 +76,10 @@ function init() {
     player = new Player(
         0,
         new Rect(canvas.width * 0.1, canvas.height * 0.5 - canvas.width * 0.2, canvas.width * 0.2, canvas.width * 0.2),
-        new Sprite(playerRunning, 32, 32, 100, 6, true),
-        new Sprite(playerJumping, 31, 33, 100, 4, false),
-        new Sprite(playerAttack, 36, 32, 100, 6, false),
-        new Sprite(playerDeath, 23, 35, 150, 6, false)
+        new Sprite(playerRunning, 32, 32, 1, 1, 100, 6, true),
+        new Sprite(playerJumping, 31, 33, 1, 1, 100, 4, false),
+        new Sprite(playerAttack, 36, 32, 1, 1, 100, 6, false),
+        new Sprite(playerDeath, 23, 35, 0.75, 1, 150, 6, false)
     );
 
     // Spawn the building the player initially starts on top of

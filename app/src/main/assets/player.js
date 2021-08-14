@@ -154,7 +154,7 @@ class Player extends Entity {
             fireballs.push(new Fireball(
                 1728 / canvas.width,
                 new Rect(this.rect.x + this.rect.width * 0.65, this.rect.y + this.rect.height * 0.2, canvas.width * 0.16, canvas.width * 0.16),
-                new Sprite(fireballSprite, 64, 64, 80, 6, true)
+                new Sprite(fireballSprite, 64, 64, 1, 1, 80, 6, true)
             ));
         }
     }

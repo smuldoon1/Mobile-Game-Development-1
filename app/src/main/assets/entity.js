@@ -14,7 +14,7 @@ class Entity {
         this.rect.x += deltaTime * this.moveSpeed * speedMultiplier;
 
         // If an entity goes too far from the canvas, it is destroyed
-        if (this.rect.x < -this.rect.width || this.rect.x > canvas.width * 2 || this.rect.y > canvas.height) {
+        if (this.rect.x < -this.rect.width * 2 || this.rect.x > canvas.width * 2 || this.rect.y > canvas.height) {
             this.destroy();
         }
 
@@ -37,7 +37,7 @@ class Entity {
         let sprite = this.sprite;
         if (sprite == null)
             return;
-        ctx.drawImage(sprite.sprite, sprite.animationFrame * sprite.width, 0, sprite.width, sprite.height, this.rect.x, this.rect.y, this.rect.width, this.rect.height);
+        ctx.drawImage(sprite.sprite, sprite.animationFrame * sprite.width, 0, sprite.width, sprite.height, this.rect.x, this.rect.y, this.rect.width * sprite.xStretch, this.rect.height * sprite.yStretch);
     }
 
     // Animates sprites over time
