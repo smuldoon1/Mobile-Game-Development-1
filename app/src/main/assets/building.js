@@ -25,7 +25,7 @@ class Building extends Entity {
                 ));
             }
             // Rarely, a powerup is spawned above and to the right of a building
-            if (Math.random() > 0.0) {
+            if (Math.random() > 0.9) {
                 let powerup = Powerup.getRandomPowerup();
                 new Powerup(
                     -720 / canvas.width,

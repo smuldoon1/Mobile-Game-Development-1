@@ -17,7 +17,7 @@ class Powerup extends Entity {
     // Get a random powerup for the purpose of spawning a new powerup entity
     static getRandomPowerup() {
         let randomNumber = Math.random();
-        if (randomNumber > 0.5)
+        if (randomNumber > 0.6)
             return "health";
         else
             return "rapid_fire";

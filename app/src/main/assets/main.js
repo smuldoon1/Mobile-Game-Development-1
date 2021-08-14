@@ -157,8 +157,8 @@ function render() {
     //ctx.fillText("fireballs: " + fireballs.length, canvas.width * 0.05, fontSize * 8.5);
     //ctx.fillText("buildings: " + buildings.length, canvas.width * 0.05, fontSize * 10.5);
 
-    ctx.fillStyle = '#ff0000';
-    ctx.fillText("rapid fire: " + Powerup.rapidFireTimer, canvas.width * 0.05, fontSize * 4.5);
+    //ctx.fillStyle = '#ff0000';
+    //ctx.fillText("rapid fire: " + Powerup.rapidFireTimer, canvas.width * 0.05, fontSize * 4.5);
 
     // RequestAnimationFrame used instead to stop the flickering caused by calling the render function with setInterval();
     requestAnimationFrame(render);
