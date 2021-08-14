@@ -10,6 +10,7 @@ var enemyDeath = document.getElementById('enemyDeath');
 var enemyAttack = document.getElementById('enemyAttack');
 var fireballSprite = document.getElementById('fireball');
 var healthPowerup = document.getElementById('healthPowerup');
+var rapidFirePowerup = document.getElementById('rapidFirePowerup');
 var healthbarEmpty = document.getElementById('healthbarEmpty');
 var healthbarNearDeath = document.getElementById('healthbarNearDeath');
 var healthbarDamaged = document.getElementById('healthbarDamaged');
@@ -120,6 +121,9 @@ function update() {
         if (speedMultiplier > 1.5)
             speedMultiplier = 1.5;
     }
+
+    // Update powerup timers
+    Powerup.updateTimers(deltaTime);
 }
 
 // Handles rendering of sprites and UI elements
@@ -152,6 +156,9 @@ function render() {
     //ctx.fillText("enemies: " + enemies.length, canvas.width * 0.05, fontSize * 6.5);
     //ctx.fillText("fireballs: " + fireballs.length, canvas.width * 0.05, fontSize * 8.5);
     //ctx.fillText("buildings: " + buildings.length, canvas.width * 0.05, fontSize * 10.5);
+
+    ctx.fillStyle = '#ff0000';
+    ctx.fillText("rapid fire: " + Powerup.rapidFireTimer, canvas.width * 0.05, fontSize * 4.5);
 
     // RequestAnimationFrame used instead to stop the flickering caused by calling the render function with setInterval();
     requestAnimationFrame(render);

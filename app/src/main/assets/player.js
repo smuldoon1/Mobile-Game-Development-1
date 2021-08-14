@@ -148,7 +148,7 @@ class Player extends Entity {
 
     // Called when the player taps the right-hand side of the screen
     attack() {
-        if (this.attackCooldownTimer <= 0 && this.isAlive) {
+        if ((this.attackCooldownTimer <= 0 || Powerup.rapidFireTimer > 0) && this.isAlive) {
             this.isPlayingAttackAnimation = true;
             this.setSprite("attack");
             this.attackCooldownTimer = player.attackCooldown;
