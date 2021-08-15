@@ -105,6 +105,7 @@ function update() {
     for (var i = 0; i < entities.length; i++) {
         entities[i].animationTick();
         entities[i].update();
+        entities[i].checkToDestroy();
     }
 
     // Building spawning

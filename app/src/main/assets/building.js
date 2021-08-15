@@ -48,7 +48,7 @@ class Building extends Entity {
     }
 
     destroy() {
-        super.destroy();
+        super.toDestroy = true;
         removeFromArray(buildings, this);
     }
 }

@@ -5,6 +5,7 @@ class Entity {
         this.rect = rect;
         this.sprite = sprite;
         this.drawOrder = 0;
+        this.toDestroy = false;
         entities.push(this);
         entities.sort(sortByDrawOrder);
     }
@@ -20,7 +21,7 @@ class Entity {
 
         // If an entity goes out of bounds, it is destroyed
         if (this.rect.x < -this.rect.width * 2 || this.rect.y > canvas.height) {
-            this.destroy();
+            this.toDestroy = true;
         }
 
         // Check for collisions
@@ -101,7 +102,8 @@ class Entity {
         //console.log(getType(this) + " collided with " + getType(e));
     }
 
-    destroy() {
-        removeFromArray(entities, this);
+    checkToDestroy() {
+        if (this.toDestroy)
+            removeFromArray(entities, this);
     }
 }

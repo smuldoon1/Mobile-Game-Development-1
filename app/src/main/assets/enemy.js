@@ -37,7 +37,7 @@ class Enemy extends Entity {
     }
 
     destroy() {
-        super.destroy();
+        super.toDestroy = true;
         removeFromArray(enemies, this);
     }
 }

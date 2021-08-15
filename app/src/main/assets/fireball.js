@@ -8,7 +8,7 @@ class Fireball extends Entity {
         super.update();
         // Destroy fireballs as soon as they go off the right side of the screen
         if (this.rect.x > canvas.width)
-            this.destroy();
+            this.toDestroy = true;
     }
 
     onCollision(e) {
@@ -22,13 +22,13 @@ class Fireball extends Entity {
                 e.setSprite("dead");
                 enemyDeathSFX.play();
                 score += 50;
-                this.destroy();
+                this.toDestroy = true;
             }
         }
     }
 
     destroy() {
-        super.destroy();
+        super.toDestroy = true;
         removeFromArray(fireballs, this);
     }
 }

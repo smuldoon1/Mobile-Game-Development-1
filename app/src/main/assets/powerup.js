@@ -57,7 +57,7 @@ class Powerup extends Entity {
             }
             powerupSFX.play(); // Play powerup pickup sound
             score += 100; // Give the player 100 score
-            this.destroy(); // Destroy powerup
+            this.toDestroy = true; // Destroy powerup
         }
     }
 }
