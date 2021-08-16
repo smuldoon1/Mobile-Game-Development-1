@@ -47,6 +47,9 @@ var timeSinceLastBuilding;
 var maxTimeSinceLastBuilding;
 var buildingGap;
 
+var scene;
+var gameLoopInterval;
+
 var player;
 var enemies = [];
 var fireballs = [];
@@ -55,11 +58,23 @@ var buildings = [];
 var entities = [];
 
 function init() {
-    previousDate = performance.now();
+    ctx.imageSmoothingEnabled = false; // Ensures sprites are not drawn blurry
 
+    previousDate = performance.now(); // Initialise the date used to keep track of time
+
+    // Setup background
     backgroundScroll = 0;
     backgroundWidth = canvas.width / (canvas.height / background.height);
 
+    // Add touch event listeners
+    document.addEventListener("touchstart", Input.touchStartHandler, false);
+    document.addEventListener("touchend", Input.touchEndHandler, false);
+
+    requestAnimationFrame(render); // Start drawing to the canvas
+    setScene("main_menu"); // Start the game in the main menu scene
+}
+
+function startGame() {
     score = 0;
 
     jumpHeldTime = 0;
@@ -92,10 +107,6 @@ function init() {
         new Rect(0, canvas.height * 0.5, canvas.width * 1.5, canvas.height),
         null
     ));
-
-    // Add touch event listeners
-    document.addEventListener("touchstart", Input.touchStartHandler, false);
-    document.addEventListener("touchend", Input.touchEndHandler, false);
 
     music.play();
 }
@@ -141,25 +152,17 @@ function render() {
         entities[i].draw();
     }
 
-    // Get the correct healthbar image for the players health and draw it on the canvas
-    let healthbar = getHealthbarImage();
-    ctx.drawImage(healthbar, canvas.width - canvas.width * 0.45 - 20, 20, canvas.width * 0.45, canvas.width * 0.12);
+    if (scene == "game_level") {
+        // Get the correct healthbar image for the players health and draw it on the canvas
+        let healthbar = getHealthbarImage();
+        ctx.drawImage(healthbar, canvas.width - canvas.width * 0.45 - 20, 20, canvas.width * 0.45, canvas.width * 0.12);
 
-    // Set up the custom font and draw the players score on the canvas
-    let fontSize = getFontSize(40);
-    ctx.font = fontSize + 'px Score_Font';
-    ctx.fillStyle = '#fff133';
-    ctx.fillText("score: " + Math.round(score), canvas.width * 0.05, fontSize * 2.5);
-
-    // Entity debugging
-    //ctx.fillStyle = '#0000ff';
-    //ctx.fillText("entites: " + entities.length, canvas.width * 0.05, fontSize * 4.5);
-    //ctx.fillText("enemies: " + enemies.length, canvas.width * 0.05, fontSize * 6.5);
-    //ctx.fillText("fireballs: " + fireballs.length, canvas.width * 0.05, fontSize * 8.5);
-    //ctx.fillText("buildings: " + buildings.length, canvas.width * 0.05, fontSize * 10.5);
-
-    //ctx.fillStyle = '#ff0000';
-    //ctx.fillText("rapid fire: " + Powerup.rapidFireTimer, canvas.width * 0.05, fontSize * 4.5);
+        // Set up the custom font and draw the players score on the canvas
+        let fontSize = getFontSize(40);
+        ctx.font = fontSize + 'px Score_Font';
+        ctx.fillStyle = '#fff133';
+        ctx.fillText("score: " + Math.round(score), canvas.width * 0.05, fontSize * 2.5);
+    }
 
     // RequestAnimationFrame used instead to stop the flickering caused by calling the render function with setInterval();
     requestAnimationFrame(render);
@@ -190,13 +193,14 @@ function gameLoop() {
 
 // Set the game scene
 function setScene(sceneName) {
+    scene = sceneName;
     switch (sceneName) {
         case "main_menu":
             clearInterval(gameLoopInterval);
             showMainMenu();
             break;
         case "game_level":
-            init(); // Sets up game variables
+            startGame(); // Sets up game variables
             gameLoopInterval = setInterval(gameLoop, 10); // Starts the game loop so the update and render functions are called every 10 milliseconds
             break;
         case "game_over":
@@ -241,7 +245,4 @@ function sortByDrawOrder(a, b) {
     return a.drawOrder - b.drawOrder;
 }
 
-ctx.imageSmoothingEnabled = false; // Ensures sprites are not drawn blurry
-
-requestAnimationFrame(render); // Start drawing to the canvas
-setScene("game_level"); // Start the game in the main menu scene
+init(); // Initialise the game
