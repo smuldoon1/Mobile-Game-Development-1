@@ -3,17 +3,18 @@ class Input {
     static leftMousePressed; // Keeps track of the left side of the screen being pressed
     static rightMousePressed; // Keeps track of the right side of the screen being pressed
 
+
     // Handles user touch up events
     static touchStartHandler(e) {
         let touches = e.touches;
 
         for (let i = 0; i < touches.length; i++) {
-            if (touches[i].pageX < canvas.width * 0.18) {
+            if (touches[i].pageX < screen.width * 0.5) {
                 Input.leftMousePressed = true;
                 Input.rightMousePressed = false;
                 player.jump();
             }
-            if (touches[i].pageX >= canvas.width * 0.18) {
+            if (touches[i].pageX >= screen.width * 0.5) {
                 Input.rightMousePressed = true;
                 Input.leftMousePressed = false;
                 player.attack();
