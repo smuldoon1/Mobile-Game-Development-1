@@ -14,7 +14,7 @@ class Entity {
     update() {
 
         // Workaround to make buildings and enemies stop moving once the player has died
-        if (player.isAlive || this.moveSpeed > 0) {
+        if (scene == "game_level" && (player.isAlive || this.moveSpeed > 0)) {
             // Move all entities to give the illusion that the player is moving
             this.rect.x += deltaTime * this.moveSpeed * speedMultiplier;
         }

@@ -74,7 +74,19 @@ function init() {
     setScene("main_menu"); // Start the game in the main menu scene
 }
 
+function resetEntities() {
+    player = null;
+
+    enemies = [];
+    fireballs = [];
+    buildings = [];
+
+    entities = [];
+}
+
 function startGame() {
+    resetEntities();
+
     score = 0;
 
     jumpHeldTime = 0;
@@ -119,23 +131,25 @@ function update() {
         entities[i].checkToDestroy();
     }
 
-    // Building spawning
-    Building.attemptSpawn();
+    if (scene == "game_level") {
+        // Building spawning
+        Building.attemptSpawn();
 
-    // While the player is alive, the background should scroll and the score should increment
-    if (player.isAlive) {
-        backgroundScroll += deltaTime * 0.025 * speedMultiplier;
-        if (backgroundScroll > background.width * 0.5)
-            backgroundScroll -= background.width * 0.5;
+        // While the player is alive, the background should scroll and the score should increment
+        if (player.isAlive) {
+            backgroundScroll += deltaTime * 0.025 * speedMultiplier;
+            if (backgroundScroll > background.width * 0.5)
+                backgroundScroll -= background.width * 0.5;
 
-        score += deltaTime * 0.01 * speedMultiplier;
-        speedMultiplier += deltaTime * 0.0000025;
-        if (speedMultiplier > 1.5)
-            speedMultiplier = 1.5;
+            score += deltaTime * 0.01 * speedMultiplier;
+            speedMultiplier += deltaTime * 0.0000025;
+            if (speedMultiplier > 1.5)
+                speedMultiplier = 1.5;
+        }
+
+        // Update powerup timers
+        Powerup.updateTimers(deltaTime);
     }
-
-    // Update powerup timers
-    Powerup.updateTimers(deltaTime);
 }
 
 // Handles rendering of sprites and UI elements
@@ -173,7 +187,8 @@ function getRandomBuilding() {
 }
 
 function showMainMenu() {
-
+    resetEntities();
+    new Button(0, new Rect(canvas.width * 0.3, canvas.width * 0.4, canvas.width * 0.4, canvas.width * 0.2), null);
 }
 
 function showGameOver() {
@@ -194,14 +209,13 @@ function gameLoop() {
 // Set the game scene
 function setScene(sceneName) {
     scene = sceneName;
+    gameLoopInterval = setInterval(gameLoop, 10); // Starts the game loop so the update functions are called every 10 milliseconds
     switch (sceneName) {
         case "main_menu":
-            clearInterval(gameLoopInterval);
             showMainMenu();
             break;
         case "game_level":
             startGame(); // Sets up game variables
-            gameLoopInterval = setInterval(gameLoop, 10); // Starts the game loop so the update and render functions are called every 10 milliseconds
             break;
         case "game_over":
             showGameOver();

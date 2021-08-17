@@ -144,6 +144,7 @@ class Player extends Entity {
         player.setSprite("dead");
         music.pause();
         playerDeathSFX.play();
+        setScene("game_over");
     }
 
     // Called when the player taps the right-hand side of the screen
