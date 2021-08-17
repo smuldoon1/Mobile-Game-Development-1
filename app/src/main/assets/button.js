@@ -13,7 +13,7 @@ class Button extends Entity {
         ctx.closePath();
     }
 
-    checkTouch(rect, currentTouches) {
+    checkTouch(rect) {
         if (Button.isButtonTouched(rect)) {
             console.log("Button touched");
         }

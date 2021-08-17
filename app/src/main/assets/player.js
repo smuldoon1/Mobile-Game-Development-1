@@ -9,6 +9,7 @@ class Player extends Entity {
         this.health = 3;
         this.jumps = 2;
         this.velocity = initialVelocity;
+        this.jumpHeldTime = 0;
         this.attackCooldown = 700; // The minimum time allowed between attacks
         this.attackCooldownTimer = 0; // Used to track time between player attacks
         this.isGrounded = true;
@@ -61,14 +62,14 @@ class Player extends Entity {
 
         // If the jump input is held down for a short time while the player is jumping, the jump height should increase slightly
         if (Input.leftMousePressed) {
-            if (this.isJumping && jumpHeldTime < maxJumpHoldTime) {
-                this.velocity -= jumpFoldForce * (jumpHeldTime / maxJumpHoldTime);
-                jumpHeldTime += deltaTime;
+            if (this.isJumping && this.jumpHeldTime < maxJumpHoldTime) {
+                this.velocity -= jumpHoldForce * (this.jumpHeldTime / maxJumpHoldTime);
+                this.jumpHeldTime += deltaTime;
             }
         }
         else {
             this.isJumping = false;
-            jumpHeldTime = 0;
+            this.jumpHeldTime = 0;
         }
 
         // If the player falls to the bottom of the screen, they are killed

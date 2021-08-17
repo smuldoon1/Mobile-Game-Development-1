@@ -34,14 +34,13 @@ var backgroundWidth;
 
 var score;
 
-var jumpHeldTime;
 var maxJumpHoldTime;
 var speedMultiplier;
 
 var gravity;
 var initialVelocity;
 var initialJumpForce;
-var jumpFoldForce;
+var jumpHoldForce;
 
 var timeSinceLastBuilding;
 var maxTimeSinceLastBuilding;
@@ -96,7 +95,7 @@ function startGame() {
     gravity = 8.88 / canvas.height;
     initialVelocity = 296 / canvas.height;
     initialJumpForce = -3350 / canvas.height;
-    jumpFoldForce = 100 / canvas.height;
+    jumpHoldForce = 100 / canvas.height;
 
     timeSinceLastBuilding = 1080000 / canvas.width;
     maxTimeSinceLastBuilding = 1620000 / canvas.width;
@@ -111,7 +110,7 @@ function startGame() {
         new Sprite(playerAttack, 36, 32, 1, 1, 100, 6, false),
         new Sprite(playerDeath, 23, 35, 0.75, 1, 150, 6, false)
     );
-    player.setDrawOrder(1000); // Give player an arbitrarily high draw order to make sure it is drawn in front of other entities
+    player.setDrawOrder(100); // Give player an arbitrarily high draw order to make sure it is drawn in front of other entities
 
     // Spawn the building the player initially starts on top of
     buildings.push(new Building(

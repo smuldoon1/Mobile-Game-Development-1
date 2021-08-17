@@ -22,6 +22,7 @@ class Fireball extends Entity {
                 e.setSprite("dead");
                 enemyDeathSFX.play();
                 score += 50;
+                new Text(-720 / canvas.width, this.rect, null, "+50", '#fff712');
                 this.toDestroy = true;
             }
         }

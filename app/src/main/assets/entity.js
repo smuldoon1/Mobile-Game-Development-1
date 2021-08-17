@@ -98,6 +98,9 @@ class Entity {
 
     // Called every frame for every collision this entity is making with another
     onCollision(e) {
+        if (this.toDestroy) // Ensure collisions dont happen when the object is scheduled to be destroyed
+            return;
+
         // Used to debug collisions
         //console.log(getType(this) + " collided with " + getType(e));
     }
