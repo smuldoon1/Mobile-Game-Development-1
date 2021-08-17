@@ -22,7 +22,7 @@ class Text extends Entity {
         let fontSize = getFontSize(40);
         ctx.font = fontSize + 'px Score_Font';
         ctx.fillStyle = this.colour;
-        ctx.fillText(this.text, this.rect.x, this.rect.y);
+        ctx.fillText(this.text, this.rect.x + this.rect.width * 0.5, this.rect.y + this.rect.height * 0.5);
         ctx.closePath();
     }
 }
