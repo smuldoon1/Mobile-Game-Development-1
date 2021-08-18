@@ -11,7 +11,7 @@ class Building extends Entity {
                 -720 / canvas.width,
                 //new Rect(canvas.width * 1.5, Math.random() * canvas.height * 0.4 + (canvas.height * 0.25), Math.random() * canvas.width * 0.6 + canvas.width * 0.25, canvas.height),
                 new Rect(canvas.width * 1.5, Math.random() * canvas.height * 0.4 + (canvas.height * 0.25), canvas.width * 0.6 + canvas.width * 0.25, canvas.height),
-                new Sprite(building48Sprite, 48, 128, 1, 1, 0, 0, false)
+                new Sprite(building48Sprite, 48, 256, 0, -canvas.height, 1, 2, 0, 0, false)
             );
             buildings.push(newBuilding);
 
@@ -20,9 +20,9 @@ class Building extends Entity {
                 enemies.push(new Enemy(
                     -720 / canvas.width,
                     new Rect(newBuilding.rect.x + newBuilding.rect.width * 0.75 - canvas.width * 0.075, newBuilding.rect.y - canvas.width * 0.275, canvas.width * 0.15, canvas.width * 0.275),
-                    new Sprite(enemyIdle, 36, 36, 1.8, 1, 150, 4, true),
-                    new Sprite(enemyAttack, 36, 36, 1.8, 1, 100, 6, false),
-                    new Sprite(enemyDeath, 36, 36, 1.8, 1, 100, 6, false)
+                    new Sprite(enemyIdle, 36, 36, 0, 0, 1.8, 1, 150, 4, true),
+                    new Sprite(enemyAttack, 36, 36, 0, 0, 1.8, 1, 100, 6, false),
+                    new Sprite(enemyDeath, 36, 36, 0, 0, 1.8, 1, 100, 6, false)
                 ));
             }
             // Rarely, a powerup is spawned above and to the right of a building
@@ -31,7 +31,7 @@ class Building extends Entity {
                 new Powerup(
                     -720 / canvas.width,
                     new Rect(newBuilding.rect.x + newBuilding.rect.width + canvas.width * 0.2, newBuilding.rect.y - canvas.width * 0.5, canvas.width * 0.08, canvas.width * 0.08),
-                    new Sprite(Powerup.getPowerupSprite(powerup), 16, 16, 1, 1, 100, 8, true),
+                    new Sprite(Powerup.getPowerupSprite(powerup), 16, 16, 0, 0, 1, 1, 100, 8, true),
                     powerup
                 );
             }

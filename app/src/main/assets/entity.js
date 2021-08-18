@@ -45,7 +45,7 @@ class Entity {
         let sprite = this.sprite;
         if (sprite == null)
             return;
-        ctx.drawImage(sprite.sprite, sprite.animationFrame * sprite.width, 0, sprite.width, sprite.height, this.rect.x, this.rect.y, this.rect.width * sprite.xStretch, this.rect.height * sprite.yStretch);
+        ctx.drawImage(sprite.sprite, sprite.animationFrame * sprite.width, 0, sprite.width, sprite.height, this.rect.x + sprite.xOffset, this.rect.y + sprite.yOffset, this.rect.width * sprite.xStretch, this.rect.height * sprite.yStretch);
         if (Entity.showEntityRects) {
             ctx.beginPath();
             ctx.lineWidth = "5";
