@@ -10,7 +10,7 @@ class Entity {
         entities.sort(sortByDrawOrder);
     }
 
-    static showEntityRects = true; // Draw a transparent box representing all entities hitboxes, for debug use
+    static showEntityRects = false; // Draw a transparent box representing all entities hitboxes, for debug use
 
     // Called at a set interval to update any physics or non-rendering functionality of the entity
     update() {

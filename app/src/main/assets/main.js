@@ -15,7 +15,9 @@ var healthbarEmpty = document.getElementById('healthbarEmpty');
 var healthbarNearDeath = document.getElementById('healthbarNearDeath');
 var healthbarDamaged = document.getElementById('healthbarDamaged');
 var healthbarFull = document.getElementById('healthbarFull');
-var building48Sprite = document.getElementById('building48');
+var building48a = document.getElementById('building48a');
+var building48b = document.getElementById('building48b');
+var building48c = document.getElementById('building48c');
 var background = document.getElementById('background');
 
 var jumpSFX = document.getElementById('jumpSFX');

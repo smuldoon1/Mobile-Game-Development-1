@@ -7,12 +7,7 @@ class Building extends Entity {
     // Building spawning
     static attemptSpawn() {
         if (timeSinceLastBuilding > maxTimeSinceLastBuilding) {
-            let newBuilding = new Building(
-                -720 / canvas.width,
-                //new Rect(canvas.width * 1.5, Math.random() * canvas.height * 0.4 + (canvas.height * 0.25), Math.random() * canvas.width * 0.6 + canvas.width * 0.25, canvas.height),
-                new Rect(canvas.width * 1.5, Math.random() * canvas.height * 0.4 + (canvas.height * 0.25), canvas.width * 0.6 + canvas.width * 0.25, canvas.height),
-                new Sprite(building48Sprite, 48, 256, 0, -canvas.height, 1, 2, 0, 0, false)
-            );
+            let newBuilding = Building.getRandomBuilding();
             buildings.push(newBuilding);
 
             // Occasionally spawn an enemy on top of the building
@@ -38,6 +33,25 @@ class Building extends Entity {
             timeSinceLastBuilding = (Math.random() * buildingGap) - newBuilding.rect.width;
         }
         timeSinceLastBuilding += deltaTime * speedMultiplier;
+    }
+
+    static getRandomBuilding() {
+        let random = Math.random();
+        if (random > 0.7)
+            return new Building(
+                -720 / canvas.width,
+                new Rect(canvas.width * 1.5, Math.random() * canvas.height * 0.4 + (canvas.height * 0.25), canvas.width * 0.6 + canvas.width * 0.25, canvas.height),
+                new Sprite(building48a, 48, 256, 0, -canvas.height, 1, 2, 0, 0, false));
+        else if (random > 0.4)
+            return new Building(
+                -720 / canvas.width,
+                new Rect(canvas.width * 1.5, Math.random() * canvas.height * 0.4 + (canvas.height * 0.25), canvas.width * 0.6 + canvas.width * 0.25, canvas.height),
+                new Sprite(building48b, 48, 256, 0, -canvas.height, 1, 2, 0, 0, false));
+        else 
+            return new Building(
+                -720 / canvas.width,
+                new Rect(canvas.width * 1.5, Math.random() * canvas.height * 0.4 + (canvas.height * 0.25), canvas.width * 0.6 + canvas.width * 0.25, canvas.height),
+                new Sprite(building48c, 48, 256, 0, -canvas.height, 1, 2, 0, 0, false));
     }
 
     draw() {
