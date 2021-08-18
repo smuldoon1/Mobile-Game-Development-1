@@ -71,6 +71,8 @@ function init() {
 
     requestAnimationFrame(render); // Start drawing to the canvas
     setScene("main_menu"); // Start the game in the main menu scene
+
+    gameLoopInterval = setInterval(gameLoop, 10); // Starts the game loop so the update functions are called every 10 milliseconds
 }
 
 function resetEntities() {
@@ -85,6 +87,8 @@ function resetEntities() {
 
 function startGame() {
     resetEntities();
+    avgDeltaTime = 0;
+    counter = 0;
 
     score = 0;
 
@@ -123,6 +127,7 @@ function startGame() {
 }
 
 function update() {
+
     // Animate and update each entity
     for (var i = 0; i < entities.length; i++) {
         entities[i].animationTick();
@@ -187,7 +192,7 @@ function getRandomBuilding() {
 
 function showMainMenu() {
     resetEntities();
-    new Button(0, new Rect(canvas.width * 0.3, canvas.width * 0.4, canvas.width * 0.4, canvas.width * 0.2), null);
+    //new Button(0, new Rect(canvas.width * 0.3, canvas.width * 0.4, canvas.width * 0.4, canvas.width * 0.2), null);
 }
 
 function showGameOver() {
@@ -208,7 +213,6 @@ function gameLoop() {
 // Set the game scene
 function setScene(sceneName) {
     scene = sceneName;
-    gameLoopInterval = setInterval(gameLoop, 10); // Starts the game loop so the update functions are called every 10 milliseconds
     switch (sceneName) {
         case "main_menu":
             showMainMenu();
@@ -220,6 +224,7 @@ function setScene(sceneName) {
             showGameOver();
             break;
         default:
+            console.error("Invalid scene name: " + sceneName);
             break;
     }
 }

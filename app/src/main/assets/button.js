@@ -1,7 +1,6 @@
 class Button extends Entity {
     constructor(moveSpeed, rect, sprite) {
         super(moveSpeed, rect, sprite);
-        this.a = 2;
         document.addEventListener('ctouch', this.checkTouch(this.rect), false);
     }
 

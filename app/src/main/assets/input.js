@@ -7,16 +7,17 @@ class Input {
 
     // Handles user touch up events
     static touchStartHandler(e) {
-        for (let i = 0; i < e.touches.length; i++) {
+        let touches = e.touches;
+        for (let i = 0; i < touches.length; i++) {
             var event = new CustomEvent('ctouch');
             document.dispatchEvent(event);
-            if (e.touches[i].pageX < screen.width * 0.5) {
+            if (touches[i].pageX < screen.width * 0.5) {
                 Input.leftMousePressed = true;
                 Input.rightMousePressed = false;
                 if (scene == "game_level")
                     player.jump();
             }
-            if (e.touches[i].pageX >= screen.width * 0.5) {
+            if (touches[i].pageX >= screen.width * 0.5) {
                 Input.rightMousePressed = true;
                 Input.leftMousePressed = false;
                 if (scene == "game_level")
@@ -28,7 +29,7 @@ class Input {
             if (scene == "game_over") {
                 setScene("main_menu");
             }
-            Input.lastTouch = e.touches[i];
+            Input.lastTouch = touches[i];
         }
     }
 
