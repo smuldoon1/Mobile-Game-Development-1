@@ -15,9 +15,9 @@ class Building extends Entity {
                 enemies.push(new Enemy(
                     -720 / canvas.width,
                     new Rect(newBuilding.rect.x + newBuilding.rect.width * 0.75 - canvas.width * 0.075, newBuilding.rect.y - canvas.width * 0.275, canvas.width * 0.15, canvas.width * 0.275),
-                    new Sprite(enemyIdle, 36, 36, 0, 0, 1.8, 1, 150, 4, true),
-                    new Sprite(enemyAttack, 36, 36, 0, 0, 1.8, 1, 100, 6, false),
-                    new Sprite(enemyDeath, 36, 36, 0, 0, 1.8, 1, 100, 6, false)
+                    new Sprite(enemyIdle, 36, 36, -30, 0, 1.8, 1, 150, 4, true),
+                    new Sprite(enemyAttack, 36, 36, -30, 0, 1.8, 1, 100, 6, false),
+                    new Sprite(enemyDeath, 36, 36, -30, 0, 1.8, 1, 100, 6, false)
                 ));
             }
             // Rarely, a powerup is spawned above and to the right of a building
