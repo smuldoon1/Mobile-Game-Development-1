@@ -18,6 +18,7 @@ var healthbarFull = document.getElementById('healthbarFull');
 var building48a = document.getElementById('building48a');
 var building48b = document.getElementById('building48b');
 var building48c = document.getElementById('building48c');
+var building48d = document.getElementById('building48d');
 var background = document.getElementById('background');
 
 var jumpSFX = document.getElementById('jumpSFX');

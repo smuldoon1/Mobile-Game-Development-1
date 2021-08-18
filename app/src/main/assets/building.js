@@ -47,11 +47,16 @@ class Building extends Entity {
                 -720 / canvas.width,
                 new Rect(canvas.width * 1.5, Math.random() * canvas.height * 0.4 + (canvas.height * 0.25), canvas.width * 0.6 + canvas.width * 0.25, canvas.height),
                 new Sprite(building48b, 48, 256, 0, -canvas.height, 1, 2, 0, 0, false));
-        else 
+        else if (random > 0.1)
             return new Building(
                 -720 / canvas.width,
                 new Rect(canvas.width * 1.5, Math.random() * canvas.height * 0.4 + (canvas.height * 0.25), canvas.width * 0.6 + canvas.width * 0.25, canvas.height),
                 new Sprite(building48c, 48, 256, 0, -canvas.height, 1, 2, 0, 0, false));
+        else 
+            return new Building(
+                -720 / canvas.width,
+                new Rect(canvas.width * 1.5, Math.random() * canvas.height * 0.4 + (canvas.height * 0.25), canvas.width * 0.6 + canvas.width * 0.25, canvas.height),
+                new Sprite(building48d, 48, 256, 0, -canvas.height, 1, 2, 0, 0, false));
     }
 
     draw() {
