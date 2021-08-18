@@ -15,6 +15,7 @@ var healthbarEmpty = document.getElementById('healthbarEmpty');
 var healthbarNearDeath = document.getElementById('healthbarNearDeath');
 var healthbarDamaged = document.getElementById('healthbarDamaged');
 var healthbarFull = document.getElementById('healthbarFull');
+var building48Sprite = document.getElementById('building48');
 var background = document.getElementById('background');
 
 var jumpSFX = document.getElementById('jumpSFX');
@@ -184,10 +185,6 @@ function render() {
 
     // RequestAnimationFrame used instead to stop the flickering caused by calling the render function with setInterval();
     requestAnimationFrame(render);
-}
-
-function getRandomBuilding() {
-
 }
 
 function showMainMenu() {

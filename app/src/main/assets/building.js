@@ -9,8 +9,9 @@ class Building extends Entity {
         if (timeSinceLastBuilding > maxTimeSinceLastBuilding) {
             let newBuilding = new Building(
                 -720 / canvas.width,
-                new Rect(canvas.width * 1.5, Math.random() * canvas.height * 0.4 + (canvas.height * 0.25), Math.random() * canvas.width * 0.6 + canvas.width * 0.25, canvas.height),
-                null
+                //new Rect(canvas.width * 1.5, Math.random() * canvas.height * 0.4 + (canvas.height * 0.25), Math.random() * canvas.width * 0.6 + canvas.width * 0.25, canvas.height),
+                new Rect(canvas.width * 1.5, Math.random() * canvas.height * 0.4 + (canvas.height * 0.25), canvas.width * 0.6 + canvas.width * 0.25, canvas.height),
+                new Sprite(building48Sprite, 48, 128, 1, 1, 0, 0, false)
             );
             buildings.push(newBuilding);
 
@@ -40,11 +41,15 @@ class Building extends Entity {
     }
 
     draw() {
-        ctx.beginPath();
-        ctx.rect(this.rect.x, this.rect.y, this.rect.width, this.rect.height);
-        ctx.fillStyle = "#693996";
-        ctx.fill();
-        ctx.closePath();
+        if (this.sprite != null)
+            super.draw();
+        else {
+            ctx.beginPath();
+            ctx.rect(this.rect.x, this.rect.y, this.rect.width, this.rect.height);
+            ctx.fillStyle = "#4b4352";
+            ctx.fill();
+            ctx.closePath();
+        }
     }
 
     destroy() {
