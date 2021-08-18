@@ -10,6 +10,8 @@ class Entity {
         entities.sort(sortByDrawOrder);
     }
 
+    static showEntityRects = true; // Draw a transparent box representing all entities hitboxes, for debug use
+
     // Called at a set interval to update any physics or non-rendering functionality of the entity
     update() {
 
@@ -44,6 +46,13 @@ class Entity {
         if (sprite == null)
             return;
         ctx.drawImage(sprite.sprite, sprite.animationFrame * sprite.width, 0, sprite.width, sprite.height, this.rect.x, this.rect.y, this.rect.width * sprite.xStretch, this.rect.height * sprite.yStretch);
+        if (Entity.showEntityRects) {
+            ctx.beginPath();
+            ctx.lineWidth = "5";
+            ctx.strokeStyle = "#00ff00";
+            ctx.rect(this.rect.x, this.rect.y, this.rect.width, this.rect.height);
+            ctx.stroke();
+        }
     }
 
     // Animates sprites over time
