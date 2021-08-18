@@ -39,6 +39,11 @@ class Powerup extends Entity {
     onCollision(e) {
         super.onCollision(e);
 
+        // If powerup spawns inside a building, destroy it
+        if (getType(e) == "Building") {
+            this.toDestroy = true;
+        }
+
         // Handle player collisions
         if (getType(e) == "Player") {
             switch (this.type) {
