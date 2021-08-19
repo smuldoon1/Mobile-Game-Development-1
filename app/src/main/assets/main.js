@@ -91,7 +91,7 @@ function startGame() {
 
     jumpHeldTime = 0;
     maxJumpHoldTime = 400;
-    speedMultiplier = 0.9;
+    speedMultiplier = 0.85;
 
     gravity = 8.88 / canvas.height;
     initialVelocity = 296 / canvas.height;
@@ -144,9 +144,9 @@ function update() {
                 backgroundScroll -= background.width * 0.5;
 
             score += deltaTime * 0.01 * speedMultiplier;
-            speedMultiplier += deltaTime * 0.0000025;
-            if (speedMultiplier > 1.5)
-                speedMultiplier = 1.5;
+            speedMultiplier += deltaTime * 0.000003;
+            if (speedMultiplier > 1.6)
+                speedMultiplier = 1.6;
         }
 
         // Update powerup timers

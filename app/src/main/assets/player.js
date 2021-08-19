@@ -28,21 +28,21 @@ class Player extends Entity {
         this.isGrounded = false;
         // Cycle through all buildings and check if the player should be grounded
         for (var i = 0; i < entities.length; i++) {
-            if (getType(entities[i]) == "Building");
-            let building = entities[i];
+            if (getType(entities[i]) == "Building") {
+                let building = entities[i];
 
-            // Check if the player is directly above a building and falling
-            if (this.rect.y + this.rect.height < building.rect.y + 50 &&
-                this.rect.y + this.rect.height > building.rect.y - 30 &&
-                this.rect.x + this.rect.width >= building.rect.x &&
-                this.rect.x <= building.rect.x + building.rect.width &&
-                this.velocity > 0)
-            {
-                // If so, the player is grounded. Correct their y-position and play the running animation
-                this.isGrounded = true;
-                this.rect.y = building.rect.y - this.rect.height;
-                if (this.sprite == this.jumpSprite) {
-                    this.setSprite("run");
+                // Check if the player is directly above a building and falling
+                if (this.rect.y + this.rect.height < building.rect.y + 50 &&
+                    this.rect.y + this.rect.height > building.rect.y - 30 &&
+                    this.rect.x + this.rect.width >= building.rect.x &&
+                    this.rect.x <= building.rect.x + building.rect.width &&
+                    this.velocity > 0) {
+                    // If so, the player is grounded. Correct their y-position and play the running animation
+                    this.isGrounded = true;
+                    this.rect.y = building.rect.y - this.rect.height;
+                    if (this.sprite == this.jumpSprite) {
+                        this.setSprite("run");
+                    }
                 }
             }
         }
