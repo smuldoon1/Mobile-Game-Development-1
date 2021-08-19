@@ -4,14 +4,17 @@ class Building extends Entity {
         super(moveSpeed, rect, sprite);
     }
 
+    static timeSinceLastBuilding;
+
     // Building spawning
     static attemptSpawn() {
-        if (timeSinceLastBuilding > maxTimeSinceLastBuilding) {
+        if (this.timeSinceLastBuilding <= 0) {
+
             // Spawn a random building
             let randomBuilding = this.getRandomBuilding();
             let newBuilding = new Building(
                 -720 / canvas.width,
-                new Rect(canvas.width * 1.5, Math.random() * canvas.height * 0.4 + (canvas.height * 0.25), canvas.width * randomBuilding.width, canvas.height),
+                new Rect(canvas.width * 1.5, Math.random() * canvas.height * 0.4 + (canvas.height * 0.2), canvas.width * randomBuilding.width, canvas.height),
                 new Sprite(randomBuilding.sprite, randomBuilding.sprite.width, 256, 0, -canvas.height, 1, 2, 0, 0, false));
 
             // Occasionally spawn an enemy on top of the building
@@ -34,15 +37,17 @@ class Building extends Entity {
                     powerup
                 );
             }
-            timeSinceLastBuilding = (Math.random() * buildingGap) - newBuilding.rect.width;
+            this.timeSinceLastBuilding += canvas.width * speedMultiplier * 0.9 * Math.random() + (newBuilding.rect.width * 2);
         }
-        timeSinceLastBuilding += deltaTime * speedMultiplier;
+        this.timeSinceLastBuilding -= deltaTime;
     }
 
     // Get a random building sprite and return that sprite and building width as an object
     static getRandomBuilding() {
         let random = Math.random();
-        if (random > 0.95)
+        if (random > 0.975)
+            return { sprite: buildingCrane, width: 2 }
+        else if (random > 0.95)
             return { sprite: building16a, width: 0.2125 };
         else if (random > 0.925)
             return { sprite: building16b, width: 0.2125 };

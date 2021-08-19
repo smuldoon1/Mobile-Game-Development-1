@@ -23,6 +23,7 @@ var building48d = document.getElementById('building48d');
 var building16a = document.getElementById('building16a');
 var building16b = document.getElementById('building16b');
 var building16c = document.getElementById('building16c');
+var buildingCrane = document.getElementById('buildingCrane');
 var background = document.getElementById('background');
 
 var jumpSFX = document.getElementById('jumpSFX');
@@ -49,10 +50,6 @@ var gravity;
 var initialVelocity;
 var initialJumpForce;
 var jumpHoldForce;
-
-var timeSinceLastBuilding;
-var maxTimeSinceLastBuilding;
-var buildingGap;
 
 var scene;
 var gameLoopInterval;
@@ -82,6 +79,7 @@ function init() {
 function resetEntities() {
     entities = [];
     player = null;
+    Building.timeSinceLastBuilding = 1000;
 }
 
 function startGame() {
@@ -97,10 +95,6 @@ function startGame() {
     initialVelocity = 296 / canvas.height;
     initialJumpForce = -3350 / canvas.height;
     jumpHoldForce = 100 / canvas.height;
-
-    timeSinceLastBuilding = 1080000 / canvas.width;
-    maxTimeSinceLastBuilding = 1620000 / canvas.width;
-    buildingGap = 972000 / canvas.width;
 
     // Spawn the player
     player = new Player(
