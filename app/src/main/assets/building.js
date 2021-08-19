@@ -7,11 +7,16 @@ class Building extends Entity {
     // Building spawning
     static attemptSpawn() {
         if (timeSinceLastBuilding > maxTimeSinceLastBuilding) {
-            let newBuilding = Building.getRandomBuilding();
+            // Spawn a random building
+            let randomBuilding = this.getRandomBuilding();
+            let newBuilding = new Building(
+                -720 / canvas.width,
+                new Rect(canvas.width * 1.5, Math.random() * canvas.height * 0.4 + (canvas.height * 0.25), canvas.width * randomBuilding.width, canvas.height),
+                new Sprite(randomBuilding.sprite, randomBuilding.sprite.width, 256, 0, -canvas.height, 1, 2, 0, 0, false));
             buildings.push(newBuilding);
 
             // Occasionally spawn an enemy on top of the building
-            if (newBuilding.rect.width > canvas.width * 0.4 && Math.random() > 0.6) {
+            if (newBuilding.rect.width > canvas.width * 0.4 && Math.random() > 0.55) {
                 enemies.push(new Enemy(
                     -720 / canvas.width,
                     new Rect(newBuilding.rect.x + newBuilding.rect.width * 0.75 - canvas.width * 0.075, newBuilding.rect.y - canvas.width * 0.275, canvas.width * 0.15, canvas.width * 0.275),
@@ -35,40 +40,22 @@ class Building extends Entity {
         timeSinceLastBuilding += deltaTime * speedMultiplier;
     }
 
+    // Get a random building sprite and return that sprite and building width as an object
     static getRandomBuilding() {
         let random = Math.random();
-        if (random > 0.7)
-            return new Building(
-                -720 / canvas.width,
-                new Rect(canvas.width * 1.5, Math.random() * canvas.height * 0.4 + (canvas.height * 0.25), canvas.width * 0.6 + canvas.width * 0.25, canvas.height),
-                new Sprite(building48a, 48, 256, 0, -canvas.height, 1, 2, 0, 0, false));
-        else if (random > 0.4)
-            return new Building(
-                -720 / canvas.width,
-                new Rect(canvas.width * 1.5, Math.random() * canvas.height * 0.4 + (canvas.height * 0.25), canvas.width * 0.6 + canvas.width * 0.25, canvas.height),
-                new Sprite(building48b, 48, 256, 0, -canvas.height, 1, 2, 0, 0, false));
+        if (random > 0.95)
+            return { sprite: building16a, width: 0.2125 };
+        else if (random > 0.925)
+            return { sprite: building16b, width: 0.2125 };
+        else if (random > 0.9)
+            return { sprite: building16c, width: 0.2125 };
+        else if (random > 0.625)
+            return { sprite: building48a, width: 0.85 };
+        else if (random > 0.35)
+            return { sprite: building48b, width: 0.85 };
         else if (random > 0.1)
-            return new Building(
-                -720 / canvas.width,
-                new Rect(canvas.width * 1.5, Math.random() * canvas.height * 0.4 + (canvas.height * 0.25), canvas.width * 0.6 + canvas.width * 0.25, canvas.height),
-                new Sprite(building48c, 48, 256, 0, -canvas.height, 1, 2, 0, 0, false));
-        else 
-            return new Building(
-                -720 / canvas.width,
-                new Rect(canvas.width * 1.5, Math.random() * canvas.height * 0.4 + (canvas.height * 0.25), canvas.width * 0.6 + canvas.width * 0.25, canvas.height),
-                new Sprite(building48d, 48, 256, 0, -canvas.height, 1, 2, 0, 0, false));
-    }
-
-    draw() {
-        if (this.sprite != null)
-            super.draw();
-        else {
-            ctx.beginPath();
-            ctx.rect(this.rect.x, this.rect.y, this.rect.width, this.rect.height);
-            ctx.fillStyle = "#4b4352";
-            ctx.fill();
-            ctx.closePath();
-        }
+            return { sprite: building48c, width: 0.85 };
+        return { sprite: building48d, width: 0.85 };
     }
 
     destroy() {

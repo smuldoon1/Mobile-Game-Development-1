@@ -154,6 +154,7 @@ class Player extends Entity {
             this.isPlayingAttackAnimation = true;
             this.setSprite("attack");
             this.attackCooldownTimer = player.attackCooldown;
+            playerAttackSFX.pause();
             playerAttackSFX.play();
             fireballs.push(new Fireball(
                 1728 / canvas.width,

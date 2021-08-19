@@ -15,10 +15,14 @@ var healthbarEmpty = document.getElementById('healthbarEmpty');
 var healthbarNearDeath = document.getElementById('healthbarNearDeath');
 var healthbarDamaged = document.getElementById('healthbarDamaged');
 var healthbarFull = document.getElementById('healthbarFull');
+var buildingStart = document.getElementById('buildingStart');
 var building48a = document.getElementById('building48a');
 var building48b = document.getElementById('building48b');
 var building48c = document.getElementById('building48c');
 var building48d = document.getElementById('building48d');
+var building16a = document.getElementById('building16a');
+var building16b = document.getElementById('building16b');
+var building16c = document.getElementById('building16c');
 var background = document.getElementById('background');
 
 var jumpSFX = document.getElementById('jumpSFX');
@@ -121,11 +125,13 @@ function startGame() {
     player.setDrawOrder(100); // Give player an arbitrarily high draw order to make sure it is drawn in front of other entities
 
     // Spawn the building the player initially starts on top of
-    buildings.push(new Building(
+    let startBuilding = new Building(
         -720 / canvas.width,
         new Rect(0, canvas.height * 0.5, canvas.width * 1.5, canvas.height),
-        null
-    ));
+        new Sprite(buildingStart, 90, 256, 0, -canvas.height, 1, 2, 0, 0, false)
+    );
+    startBuilding.setDrawOrder(105);
+    buildings.push(startBuilding);
 
     music.play();
 }
