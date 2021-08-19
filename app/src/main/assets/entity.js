@@ -7,7 +7,7 @@ class Entity {
         this.drawOrder = 0;
         this.toDestroy = false;
         entities.push(this);
-        entities.sort(sortByDrawOrder);
+        entities.sort(compareDrawOrder);
     }
 
     static showEntityRects = false; // Draw a transparent box representing all entities hitboxes, for debug use
@@ -97,7 +97,7 @@ class Entity {
     // Entities with the same draw order will be drawn in the order they were created
     setDrawOrder(drawOrder) {
         this.drawOrder = drawOrder;
-        entities.sort(sortByDrawOrder);
+        entities.sort(compareDrawOrder);
     }
 
     // Allows classes to handle what should happen after a non-looped animation ends

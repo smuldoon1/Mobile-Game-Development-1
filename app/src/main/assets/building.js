@@ -4,7 +4,31 @@ class Building extends Entity {
         super(moveSpeed, rect, sprite);
     }
 
-    static timeSinceLastBuilding;
+    static timeSinceLastBuilding; // Keep track of the time since the last building
+
+    // Random buildings are chosen from this array
+    static buildings = [
+        { sprite: building16a, weight: 35, width: 0.2125 },
+        { sprite: building16b, weight: 10, width: 0.2125 },
+        { sprite: building16c, weight: 15, width: 0.2125 },
+        { sprite: building48a, weight: 60, width: 0.85 },
+        { sprite: building48b, weight: 60, width: 0.85 },
+        { sprite: building48c, weight: 55, width: 0.85 },
+        { sprite: building48d, weight: 20, width: 0.85 },
+        { sprite: building64a, weight: 45, width: 1.1333 },
+        { sprite: building64b, weight: 45, width: 1.1333 },
+        { sprite: buildingCrane, weight: 10, width: 2 },
+        { sprite: buildingPallet, weight: 1, width: 0.425 }
+    ];
+    static weightTotal = 0; // The total weight of all buildings used to get a random building
+
+    // Setup building weights so they can be used to get random buildings
+    static setup() {
+        this.buildings.sort(this.compareWeights);
+        for (let i = 0; i < this.buildings.length; i++) {
+            this.weightTotal += this.buildings[i].weight;
+        }
+    }
 
     // Building spawning
     static attemptSpawn() {
@@ -37,28 +61,25 @@ class Building extends Entity {
                     powerup
                 );
             }
-            this.timeSinceLastBuilding += canvas.width * speedMultiplier * 0.9 * Math.random() + (newBuilding.rect.width * 2);
+            this.timeSinceLastBuilding += canvas.width * 1.9 * (speedMultiplier * 0.5) * Math.random() + (newBuilding.rect.width * 2) + 1.1;
         }
         this.timeSinceLastBuilding -= deltaTime;
     }
 
     // Get a random building sprite and return that sprite and building width as an object
     static getRandomBuilding() {
-        let random = Math.random();
-        if (random > 0.975)
-            return { sprite: buildingCrane, width: 2 }
-        else if (random > 0.95)
-            return { sprite: building16a, width: 0.2125 };
-        else if (random > 0.925)
-            return { sprite: building16b, width: 0.2125 };
-        else if (random > 0.9)
-            return { sprite: building16c, width: 0.2125 };
-        else if (random > 0.625)
-            return { sprite: building48a, width: 0.85 };
-        else if (random > 0.35)
-            return { sprite: building48b, width: 0.85 };
-        else if (random > 0.1)
-            return { sprite: building48c, width: 0.85 };
-        return { sprite: building48d, width: 0.85 };
+        let randomWeight = Math.random() * this.weightTotal;
+        let currentWeight = 0;
+        for (let i = 0; i < this.buildings.length; i++) {
+            currentWeight += this.buildings[i].weight;
+            if (randomWeight <= currentWeight)
+                return this.buildings[i];
+        }
+        console.error("No building chosen");
+    }
+
+    // Compare two buildings weights
+    static compareWeights(a, b) {
+        return a.weight - b.weight;
     }
 }

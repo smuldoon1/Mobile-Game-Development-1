@@ -23,7 +23,10 @@ var building48d = document.getElementById('building48d');
 var building16a = document.getElementById('building16a');
 var building16b = document.getElementById('building16b');
 var building16c = document.getElementById('building16c');
+var building64a = document.getElementById('building64a');
+var building64b = document.getElementById('building64b');
 var buildingCrane = document.getElementById('buildingCrane');
+var buildingPallet = document.getElementById('buildingPallet');
 var background = document.getElementById('background');
 
 var jumpSFX = document.getElementById('jumpSFX');
@@ -61,6 +64,9 @@ function init() {
     ctx.imageSmoothingEnabled = false; // Ensures sprites are not drawn blurry
 
     previousDate = performance.now(); // Initialise the date used to keep track of time
+
+    // Setup building array and weight values
+    Building.setup();
 
     // Setup background
     backgroundScroll = 0;
@@ -247,7 +253,7 @@ function removeFromArray(array, object) {
 }
 
 // Sort entities by their draw order
-function sortByDrawOrder(a, b) {
+function compareDrawOrder(a, b) {
     return a.drawOrder - b.drawOrder;
 }
 
