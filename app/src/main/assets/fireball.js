@@ -27,9 +27,4 @@ class Fireball extends Entity {
             }
         }
     }
-
-    destroy() {
-        super.toDestroy = true;
-        removeFromArray(fireballs, this);
-    }
 }

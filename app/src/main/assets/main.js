@@ -57,12 +57,8 @@ var buildingGap;
 var scene;
 var gameLoopInterval;
 
-var player;
-var enemies = [];
-var fireballs = [];
-var buildings = [];
-
 var entities = [];
+var player;
 
 function init() {
     ctx.imageSmoothingEnabled = false; // Ensures sprites are not drawn blurry
@@ -84,19 +80,12 @@ function init() {
 }
 
 function resetEntities() {
-    player = null;
-
-    enemies = [];
-    fireballs = [];
-    buildings = [];
-
     entities = [];
+    player = null;
 }
 
 function startGame() {
     resetEntities();
-    avgDeltaTime = 0;
-    counter = 0;
 
     score = 0;
 
@@ -131,7 +120,6 @@ function startGame() {
         new Sprite(buildingStart, 90, 256, 0, -canvas.height, 1, 2, 0, 0, false)
     );
     startBuilding.setDrawOrder(105);
-    buildings.push(startBuilding);
 
     music.play();
 }

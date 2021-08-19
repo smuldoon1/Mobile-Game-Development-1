@@ -27,8 +27,9 @@ class Player extends Entity {
 
         this.isGrounded = false;
         // Cycle through all buildings and check if the player should be grounded
-        for (var i = 0; i < buildings.length; i++) {
-            var building = buildings[i];
+        for (var i = 0; i < entities.length; i++) {
+            if (getType(entities[i]) == "Building");
+            let building = entities[i];
 
             // Check if the player is directly above a building and falling
             if (this.rect.y + this.rect.height < building.rect.y + 50 &&
@@ -156,11 +157,11 @@ class Player extends Entity {
             this.attackCooldownTimer = player.attackCooldown;
             playerAttackSFX.pause();
             playerAttackSFX.play();
-            fireballs.push(new Fireball(
+            new Fireball(
                 1728 / canvas.width,
                 new Rect(this.rect.x + this.rect.width * 0.65, this.rect.y + this.rect.height * 0.2, canvas.width * 0.16, canvas.width * 0.16),
                 new Sprite(fireballSprite, 64, 64, 0, 0, 1, 1, 80, 6, true)
-            ));
+            );
         }
     }
 

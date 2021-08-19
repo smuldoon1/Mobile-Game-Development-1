@@ -35,9 +35,4 @@ class Enemy extends Entity {
             this.setSprite("idle");
         }
     }
-
-    destroy() {
-        super.toDestroy = true;
-        removeFromArray(enemies, this);
-    }
 }
