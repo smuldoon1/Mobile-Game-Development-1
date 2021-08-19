@@ -1,6 +1,6 @@
 class Text extends Entity {
-    constructor(moveSpeed, rect, sprite, text, colour) {
-        super(moveSpeed, rect, sprite);
+    constructor(moveSpeed, rect, text, colour) {
+        super(moveSpeed, rect, null);
         this.text = text;
         this.colour = colour;
         this.age = 0;
@@ -10,13 +10,16 @@ class Text extends Entity {
     
     update() {
         super.update();
+
+        // Move upwards slightly and be destroyed after 1 second
         if (this.age > 1000)
             this.toDestroy = true;
         this.rect.y += this.velocity;
         this.velocity /= 1.01;
         this.age += deltaTime;
     }
-    
+
+    // Overridden draw method to draw text instead of a sprite
     draw() {
         ctx.beginPath();
         let fontSize = getFontSize(40);
