@@ -28,6 +28,7 @@ var building64b = document.getElementById('building64b');
 var buildingCrane = document.getElementById('buildingCrane');
 var buildingPallet = document.getElementById('buildingPallet');
 var background = document.getElementById('background');
+var titleScreen = document.getElementById('titleScreen');
 
 var jumpSFX = document.getElementById('jumpSFX');
 var doubleJumpSFX = document.getElementById('doubleJumpSFX');
@@ -82,6 +83,7 @@ function init() {
     gameLoopInterval = setInterval(gameLoop, 10); // Starts the game loop so the update functions are called every 10 milliseconds
 }
 
+// Clear all entities and the player, create gap before first building
 function resetEntities() {
     entities = [];
     player = null;
@@ -184,15 +186,6 @@ function render() {
     requestAnimationFrame(render);
 }
 
-function showMainMenu() {
-    resetEntities();
-    //new Button(0, new Rect(canvas.width * 0.3, canvas.width * 0.4, canvas.width * 0.4, canvas.width * 0.2), null);
-}
-
-function showGameOver() {
-
-}
-
 // Called at a set interval to update the games entities and the deltaTime
 function gameLoop() {
 
@@ -221,6 +214,16 @@ function setScene(sceneName) {
             console.error("Invalid scene name: " + sceneName);
             break;
     }
+}
+
+function showMainMenu() {
+    resetEntities();
+    backgroundScroll = background.width * 0.175;
+    new Entity(0, new Rect(0, 0, canvas.width, canvas.height), new Sprite(titleScreen, 1080, 2220, 0, 0, 1, 1, 0, 0, false));
+}
+
+function showGameOver() {
+
 }
 
 // Get the Class name of an object

@@ -13,13 +13,11 @@ class Input {
             document.dispatchEvent(event);
             if (touches[i].pageX < screen.width * 0.5) {
                 Input.leftMousePressed = true;
-                Input.rightMousePressed = false;
                 if (scene == "game_level")
                     player.jump();
             }
             if (touches[i].pageX >= screen.width * 0.5) {
                 Input.rightMousePressed = true;
-                Input.leftMousePressed = false;
                 if (scene == "game_level")
                     player.attack();
             }

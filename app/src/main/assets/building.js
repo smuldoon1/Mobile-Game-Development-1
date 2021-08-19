@@ -75,7 +75,6 @@ class Building extends Entity {
             if (randomWeight <= currentWeight)
                 return this.buildings[i];
         }
-        console.error("No building chosen");
     }
 
     // Compare two buildings weights
