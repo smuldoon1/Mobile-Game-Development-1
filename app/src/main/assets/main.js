@@ -38,7 +38,8 @@ var playerDeathSFX = document.getElementById('playerDeathSFX');
 var playerAttackSFX = document.getElementById('playerAttackSFX');
 var enemyDeathSFX = document.getElementById('enemyDeathSFX');
 var powerupSFX = document.getElementById('powerupSFX');
-var music = document.getElementById('gameMusic');
+var gameMusic = document.getElementById('gameMusic');
+var menuMusic = document.getElementById('menuMusic');
 
 var previousDate;
 var deltaTime;
@@ -82,6 +83,8 @@ function init() {
     setScene("main_menu"); // Start the game in the main menu scene
 
     gameLoopInterval = setInterval(gameLoop, 10); // Starts the game loop so the update functions are called every 10 milliseconds
+
+    menuMusic.play(); // The game starts with menu music playing
 }
 
 // Clear all entities and the player, create gap before first building
@@ -124,7 +127,8 @@ function startGame() {
     );
     startBuilding.setDrawOrder(105);
 
-    music.play();
+    gameMusic.play();
+    stopMusic(menuMusic);
 }
 
 function update() {
@@ -171,6 +175,7 @@ function render() {
         entities[i].draw();
     }
 
+    // If the game is in the game level scene, draw players health and score
     if (scene == "game_level") {
         // Get the correct healthbar image for the players health and draw it on the canvas
         let healthbar = getHealthbarImage();
@@ -203,13 +208,13 @@ function setScene(sceneName) {
     scene = sceneName;
     switch (sceneName) {
         case "main_menu":
-            showMainMenu();
+            mainMenuScreen();
             break;
         case "game_level":
             startGame(); // Sets up game variables
             break;
         case "game_over":
-            showGameOver();
+            gameOverScreen();
             break;
         default:
             console.error("Invalid scene name: " + sceneName);
@@ -218,19 +223,23 @@ function setScene(sceneName) {
 }
 
 // Show title screen and game instructions
-function showMainMenu() {
+function mainMenuScreen() {
     resetEntities();
     backgroundScroll = background.width * 0.175;
     new Entity(0, new Rect(0, 0, canvas.width, canvas.height), new Sprite(titleScreen, 1080, 2220, 0, 0, 1, 1, 0, 0, false));
 }
 
 // Show game over screen and the players score, set a new high score if necessary
-function showGameOver() {
+function gameOverScreen() {
     new Entity(0, new Rect(0, 0, canvas.width, canvas.height), new Sprite(endScreen, 1080, 2220, 0, 0, 1, 1, 0, 0, false));
     if (trySetHighscore())
         new Text(0, new Rect(canvas.width * 0.275, canvas.height * 0.3, 0, 0), "new hi-score!", "#ffffff", 40, 0, 10000000);
     new Text(0, new Rect(canvas.width * 0.1, canvas.height * 0.4, 0, 0), "score: " + Math.max(0, Math.round(score)), "#fff703", 60, 0, 10000000);
     new Text(0, new Rect(canvas.width * 0.1, canvas.height * 0.5, 0, 0), "hi-score: " + getHighScore(), "#6c33e8", 60, 0, 10000000);
+
+    // Stop the game msuic and start playing menu music again
+    menuMusic.play();
+    stopMusic(gameMusic);
 }
 
 // Check if the score is higher than the high score, if so then set it as the new high score
@@ -248,6 +257,12 @@ function getHighScore() {
     if (localStorage.getItem("highscore") != null)
         return localStorage.getItem("highscore");
     return 0;
+}
+
+// Stop an audio object by pausing it and resetting the duration back to 0
+function stopMusic(music) {
+    music.pause();
+    music.currentTime = 0;
 }
 
 // Get the Class name of an object

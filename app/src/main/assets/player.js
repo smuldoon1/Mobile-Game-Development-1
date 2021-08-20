@@ -144,7 +144,6 @@ class Player extends Entity {
     die() {
         this.health = 0;
         player.setSprite("dead");
-        music.pause();
         playerDeathSFX.play();
         setScene("game_over");
     }

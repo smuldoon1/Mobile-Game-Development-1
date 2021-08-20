@@ -3,7 +3,8 @@ Fireball sprite - https://www.pngwing.com/en/free-png-nvgnm
 City background - https://wallpaperaccess.com/city-pixel-art
 Healthbar sprite - https://www.nicepng.com/ourpic/u2q8y3i1t4q8t4y3_health-bar-original-one-hit-health-bar-pixel/
 Powerup sprites (rotating coins) - https://opengameart.org/content/rotating-coin
-Background music - https://freesound.org/people/VABsounds/sounds/443865/
+Ingame music - https://freesound.org/people/VABsounds/sounds/443865/
+Menu/game over screen music - https://freesound.org/people/Speedenza/sounds/251530/
 Jump sound - https://freesound.org/people/qubodup/sounds/60013/
 Enemy attack/player damaged sound - https://freesound.org/people/Cigaro30/sounds/420932/
 Player death - https://freesound.org/people/myfox14/sounds/382310/
