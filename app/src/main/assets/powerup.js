@@ -51,12 +51,12 @@ class Powerup extends Entity {
                 case "health":
                     if (e.health < 3)
                         e.health++; // Heal player by one
-                    new Text(-720 / canvas.width, this.rect, "health boost", '#1ced1c', -1, 1000);
+                    new Text(-720 / canvas.width, this.rect, "health boost", '#1ced1c', 40, -1, 1000);
                     break;
                 // Rapid fire powerup
                 case "rapid_fire":
                     Powerup.rapidFireTimer = 8000; // Give the player 8 seconds of rapid fire
-                    new Text(-720 / canvas.width, this.rect, "rapid fire", '#ff7c0a', -1, 1000);
+                    new Text(-720 / canvas.width, this.rect, "rapid fire", '#ff7c0a', 40, -1, 1000);
                     break;                    
                 default:
                     console.error("Invalid powerup type: " + type);

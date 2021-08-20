@@ -29,6 +29,7 @@ var buildingCrane = document.getElementById('buildingCrane');
 var buildingPallet = document.getElementById('buildingPallet');
 var background = document.getElementById('background');
 var titleScreen = document.getElementById('titleScreen');
+var endScreen = document.getElementById('endScreen');
 
 var jumpSFX = document.getElementById('jumpSFX');
 var doubleJumpSFX = document.getElementById('doubleJumpSFX');
@@ -93,7 +94,7 @@ function resetEntities() {
 function startGame() {
     resetEntities();
 
-    score = 0;
+    score = -29; // Start score in the negative so the player will get a score of 0 if they fall straight away
 
     jumpHeldTime = 0;
     maxJumpHoldTime = 400;
@@ -179,7 +180,7 @@ function render() {
         let fontSize = getFontSize(40);
         ctx.font = fontSize + 'px Score_Font';
         ctx.fillStyle = '#fff133';
-        ctx.fillText("score: " + Math.round(score), canvas.width * 0.05, fontSize * 2.5);
+        ctx.fillText("score: " + Math.max(0, Math.round(score)), canvas.width * 0.05, fontSize * 2.5);
     }
 
     // RequestAnimationFrame used instead to stop the flickering caused by calling the render function with setInterval();
@@ -216,14 +217,18 @@ function setScene(sceneName) {
     }
 }
 
+// Show title screen and game instructions
 function showMainMenu() {
     resetEntities();
     backgroundScroll = background.width * 0.175;
     new Entity(0, new Rect(0, 0, canvas.width, canvas.height), new Sprite(titleScreen, 1080, 2220, 0, 0, 1, 1, 0, 0, false));
 }
 
+// Show game over screen and the players score
 function showGameOver() {
-
+    new Entity(0, new Rect(0, 0, canvas.width, canvas.height), new Sprite(endScreen, 1080, 2220, 0, 0, 1, 1, 0, 0, false));
+    new Text(0, new Rect(canvas.width * 0.1, canvas.height * 0.4, 0, 0), "score: " + Math.max(0, Math.round(score)), "#fff703", 60, 0, 10000000);
+    new Text(0, new Rect(canvas.width * 0.1, canvas.height * 0.5, 0, 0), "hi-score: " + Math.max(0, Math.round(score)), "#6c33e8", 60, 0, 10000000);
 }
 
 // Get the Class name of an object
