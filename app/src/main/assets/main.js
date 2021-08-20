@@ -224,11 +224,30 @@ function showMainMenu() {
     new Entity(0, new Rect(0, 0, canvas.width, canvas.height), new Sprite(titleScreen, 1080, 2220, 0, 0, 1, 1, 0, 0, false));
 }
 
-// Show game over screen and the players score
+// Show game over screen and the players score, set a new high score if necessary
 function showGameOver() {
     new Entity(0, new Rect(0, 0, canvas.width, canvas.height), new Sprite(endScreen, 1080, 2220, 0, 0, 1, 1, 0, 0, false));
+    if (trySetHighscore())
+        new Text(0, new Rect(canvas.width * 0.275, canvas.height * 0.3, 0, 0), "new hi-score!", "#ffffff", 40, 0, 10000000);
     new Text(0, new Rect(canvas.width * 0.1, canvas.height * 0.4, 0, 0), "score: " + Math.max(0, Math.round(score)), "#fff703", 60, 0, 10000000);
-    new Text(0, new Rect(canvas.width * 0.1, canvas.height * 0.5, 0, 0), "hi-score: " + Math.max(0, Math.round(score)), "#6c33e8", 60, 0, 10000000);
+    new Text(0, new Rect(canvas.width * 0.1, canvas.height * 0.5, 0, 0), "hi-score: " + getHighScore(), "#6c33e8", 60, 0, 10000000);
+}
+
+// Check if the score is higher than the high score, if so then set it as the new high score
+// Returns true if there is a new high score
+function trySetHighscore() {
+    if (score > getHighScore()) {
+        localStorage.setItem("highscore", JSON.stringify(Math.max(0, Math.round(score))));
+        return true;
+    }
+    return false;
+}
+
+// Get the highscore saved to the device
+function getHighScore() {
+    if (localStorage.getItem("highscore") != null)
+        return localStorage.getItem("highscore");
+    return 0;
 }
 
 // Get the Class name of an object
