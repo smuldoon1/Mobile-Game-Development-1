@@ -19,6 +19,6 @@ canvas {
 }
 @font-face {
     font-family: "Score_Font";
-    src: url("file:///android_asset/8-bit-pusab.woff") format("woff");
+    src: url("file:///android_asset/fonts/8-bit-pusab.woff") format("woff");
     font-weight: bold;
 }
